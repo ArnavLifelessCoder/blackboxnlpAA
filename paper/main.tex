@@ -1,0 +1,255 @@
+% The Myth of Universal Concept Directions Under RLHF
+% BlackboxNLP 2026 @ EMNLP 2026
+%
+% Compile with: pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
+
+\documentclass[11pt]{article}
+
+% === ACL 2025 style (download acl.sty separately) ===
+% If using the official ACL style file, uncomment the next line:
+% \usepackage[review]{acl}
+% For now, use a compatible setup:
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{natbib}
+
+% === Standard packages ===
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{subcaption}
+\usepackage{multirow}
+
+% === Custom macros ===
+\newcommand{\cosim}{\text{cos-sim}}
+\newcommand{\dmodel}{d_{\text{model}}}
+\newcommand{\vdir}{\mathbf{d}}
+\newcommand{\vact}{\mathbf{a}}
+\newcommand{\R}{\mathbb{R}}
+
+% === Metadata ===
+\title{The Myth of Universal Concept Directions Under RLHF}
+
+\author{
+  Author A \\
+  \textit{Affiliation} \\
+  \texttt{email@example.com}
+  \and
+  Author B \\
+  \textit{Affiliation} \\
+  \texttt{email@example.com}
+}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+% ============================================================
+\begin{abstract}
+% TODO: Write abstract after results are in (Phase 3)
+%
+% Structure: (1) Motivation — representation engineering claims universal concept
+% directions, (2) Gap — are these directions truly universal across semantic domains?
+% (3) Method — contrastive prompt pairs, per-domain vs. global direction computation,
+% angular dispersion analysis, steering transfer tests, (4) Key findings — TBD,
+% (5) Contribution — evidence for/against domain fragmentation of concept directions
+% under RLHF alignment.
+%
+\noindent
+[Abstract placeholder — to be written after results are available.]
+\end{abstract}
+
+% ============================================================
+\section{Introduction}
+\label{sec:intro}
+
+% TODO: Person A leads this section
+%
+% Key points to cover:
+% - Representation engineering (Zou et al., 2023) claims single linear directions
+%   capture high-level concepts like honesty and refusal in LLM activation space
+% - This has practical implications for safety: if concept directions are universal,
+%   steering is straightforward; if fragmented, safety interventions may miss domains
+% - Our research question: do concept directions generalize uniformly across semantic
+%   domains, or fragment into domain-specific sub-directions?
+% - RLHF angle: does alignment amplify or reduce fragmentation?
+% - Preview of method and findings
+
+
+% ============================================================
+\section{Related Work}
+\label{sec:related}
+
+% TODO: Cover the following papers:
+%
+% Representation Engineering:
+% - \citet{zou2023representation} — canonical concept direction paper
+% - \citet{marks2023geometry} — linear structure of truth in LLM activations
+% - \citet{hernandez2023linearity} — linearity of relation decoding
+%
+% Activation Steering:
+% - \citet{turner2023activation} — activation addition for steering
+% - \citet{li2024inference} — inference-time intervention
+%
+% Safety & Alignment:
+% - \citet{wei2024assessing} — brittleness of safety alignment
+% - \citet{lieberum2023does} — scalability of circuit analysis
+
+
+% ============================================================
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Contrastive Prompt Pairs}
+\label{sec:prompts}
+
+% Describe:
+% - Concept definitions (refusal, honesty) — reference operational definitions
+% - Domain decomposition (4 domains per concept)
+% - Prompt pair construction: positive (concept-expressing) vs. negative
+% - Sources: hand-written, TruthfulQA, AdvBench
+% - Quality control: annotator agreement, length matching
+
+\subsection{Activation Extraction}
+\label{sec:extraction}
+
+% Describe:
+% - Model family: Qwen 2.5 3B (Instruct + Base)
+% - Residual stream activations at all layers
+% - Last-token position extraction
+% - Hook point: resid_post
+
+\subsection{Direction Computation}
+\label{sec:directions}
+
+% Describe:
+% - Difference-of-means: d = mean(positive) - mean(negative)
+% - Per-domain directions: computed within each domain
+% - Global direction: computed across all domains
+% - Normalization
+
+\subsection{Angular Dispersion Analysis}
+\label{sec:angular}
+
+% Describe:
+% - Cosine similarity between per-domain and global directions
+% - Layer-wise analysis
+% - Bootstrap confidence intervals
+
+\subsection{Steering Transfer Test}
+\label{sec:steering}
+
+% Describe:
+% - Apply global direction to held-out domain prompts
+% - Measure shift in model behavior
+% - Cross-domain transfer matrix: domain A direction on domain B prompts
+
+\subsection{RLHF Comparison}
+\label{sec:rlhf}
+
+% Describe:
+% - Same analysis on Base vs. Instruct checkpoints
+% - Compare angular dispersion: does RLHF increase or decrease fragmentation?
+
+
+% ============================================================
+\section{Experimental Setup}
+\label{sec:setup}
+
+% Models, compute, hyperparameters table
+% Number of prompt pairs per domain
+% Statistical methodology
+
+
+% ============================================================
+\section{Results}
+\label{sec:results}
+
+% TODO: Fill in after Phase 3
+
+\subsection{Angular Dispersion}
+\label{sec:results-angular}
+
+% Heatmap: domain × layer → cosine similarity with global direction
+
+\subsection{Steering Transfer}
+\label{sec:results-steering}
+
+% Transfer matrix: domain A direction effectiveness on domain B prompts
+
+\subsection{RLHF Effect}
+\label{sec:results-rlhf}
+
+% Base vs. Instruct comparison figure
+
+\subsection{Activation Geometry}
+\label{sec:results-geometry}
+
+% PCA/UMAP figure — most important figure in the paper
+
+
+% ============================================================
+\section{Discussion}
+\label{sec:discussion}
+
+% TODO: Interpret results
+%
+% Key questions to address:
+% - Do we find fragmentation? If so, in which layers/domains?
+% - What does this mean for representation engineering as a safety tool?
+% - Does RLHF help or hurt universality?
+% - Implications for activation steering approaches
+% - Connection to prior work
+
+
+% ============================================================
+\section{Limitations}
+\label{sec:limitations}
+
+% TODO: Cover:
+% - Model scale (3B parameters — may not generalize to larger models)
+% - Only 2 concepts (refusal, honesty)
+% - Prompt pair quality and coverage
+% - Last-token extraction may miss information
+% - Linear direction assumption
+
+
+% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+% TODO: Write after results are in
+
+
+% ============================================================
+\section*{Acknowledgments}
+
+% TODO: Add acknowledgments
+
+
+% ============================================================
+\bibliographystyle{acl_natbib}
+\bibliography{references}
+
+% ============================================================
+% Appendix (optional)
+\appendix
+
+\section{Prompt Pair Examples}
+\label{app:prompts}
+
+% TODO: Include representative examples from each domain
+
+\section{Full Layer-wise Results}
+\label{app:layers}
+
+% TODO: Include detailed per-layer results tables
+
+\end{document}

@@ -1,0 +1,38 @@
+# ============================================================
+# BlackboxNLP 2026 — Project Dependencies
+# "The Myth of Universal Concept Directions — Under RLHF"
+# ============================================================
+# Install: pip install -r requirements.txt
+# Note: PyTorch should be installed separately with CUDA support
+#   See: https://pytorch.org/get-started/locally/
+# ============================================================
+
+# --- Core ML ---
+torch>=2.1.0
+transformers>=4.40.0
+transformer_lens>=2.0.0
+bitsandbytes>=0.43.0          # 4-bit/8-bit quantization for 3B models
+accelerate>=0.30.0            # HuggingFace model loading utilities
+safetensors>=0.4.0            # Fast tensor serialization
+
+# --- Scientific Computing ---
+numpy>=1.24.0
+scipy>=1.11.0
+scikit-learn>=1.3.0           # PCA, cosine similarity
+umap-learn>=0.5.5             # UMAP dimensionality reduction
+
+# --- Visualization ---
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# --- Data Handling ---
+jsonlines>=4.0.0              # JSONL prompt pair files
+pandas>=2.1.0                 # Tabular data & results aggregation
+datasets>=2.18.0              # HuggingFace datasets (TruthfulQA)
+
+# --- Utilities ---
+tqdm>=4.66.0                  # Progress bars
+einops>=0.7.0                 # Tensor reshaping (used by TransformerLens)
+
+# --- Testing ---
+pytest>=7.4.0

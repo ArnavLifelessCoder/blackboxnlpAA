@@ -1,0 +1,49 @@
+# BlackboxNLP 2026 — .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Large files — cached activations and model weights
+results/activations/*.pt
+results/directions/*.pt
+
+# Don't ignore figures — they should be version controlled
+# results/figures/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Model downloads (don't commit these)
+models/
+*.bin
+*.safetensors
+*.gguf
+
+# Logs
+*.log
+wandb/
