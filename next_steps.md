@@ -12,21 +12,27 @@
 - [x] Extraction pipeline — `hooks.py`, `extract_activations.py`, `cache_utils.py`
 - [x] Analysis modules — `directions.py`, `angular_dispersion.py`, `steering.py`, `bootstrap.py`
 - [x] Visualization modules — `plot_utils.py`, `heatmaps.py`, `transfer_matrix.py`, `pca_umap.py`
-- [x] 10 seed pilot prompt pairs (5 refusal + 5 honesty)
+- [x] ~~10~~ → 80 seed prompt pairs (40 refusal + 40 honesty, 10 per domain)
 - [x] 26 smoke tests — all passing
 - [x] README, requirements.txt, .gitignore
+- [x] Git repo initialized — commit `725ded0` (45 files, 5222 insertions)
+- [x] Operational definitions for refusal & honesty (`docs/operational_definitions.md`)
+- [x] ACL LaTeX template (`paper/main.tex`, `paper/references.bib`)
+- [x] Dataset adapter scripts (`scripts/convert_truthfulqa.py`, `scripts/convert_advbench.py`)
+- [x] Kaggle notebook scaffold (`notebooks/01_pilot_gemma2b.py`)
 
 ---
 
 ## 🔴 Immediate — Before June 27
 
 ### 1. Git Repository
-- [ ] Run `git init` and make the first commit
+- [x] Run `git init` and make the first commit — ✅ `725ded0` (June 17)
 - [ ] Set up remote on GitHub (private repo)
 - [ ] Invite both team members
 
 ### 2. Kaggle Environment Setup
-- [ ] Create Kaggle notebook `notebooks/01_pilot_gemma2b.ipynb`
+- [x] Create Kaggle notebook — scaffolded as `notebooks/01_pilot_gemma2b.py` (jupytext format)
+- [ ] Upload to Kaggle and convert to `.ipynb`
 - [ ] Install dependencies: `transformer_lens`, `transformers`, `bitsandbytes`
 - [ ] Verify GPU access (T4 or P100)
 - [ ] Confirm `torch.cuda.is_available()` returns True
@@ -43,20 +49,20 @@
 - [ ] Compute pilot directions (global + per-domain) — sanity check
 - [ ] Compute pilot cosine similarities — are directions even distinguishable?
 
-### 5. Expand Seed Prompt Pairs → 80 Total
-- [ ] Refusal/violence: 2 → 10 pairs
-- [ ] Refusal/illegal_activity: 1 → 10 pairs
-- [ ] Refusal/medical_legal: 1 → 10 pairs
-- [ ] Refusal/privacy: 1 → 10 pairs
-- [ ] Honesty/factual_trivia: 2 → 10 pairs
-- [ ] Honesty/math: 1 → 10 pairs
-- [ ] Honesty/politics_opinion: 1 → 10 pairs
-- [ ] Honesty/personal_advice: 1 → 10 pairs
+### 5. Expand Seed Prompt Pairs → 80 Total ✅
+- [x] Refusal/violence: 2 → 10 pairs
+- [x] Refusal/illegal_activity: 1 → 10 pairs
+- [x] Refusal/medical_legal: 1 → 10 pairs
+- [x] Refusal/privacy: 1 → 10 pairs
+- [x] Honesty/factual_trivia: 2 → 10 pairs
+- [x] Honesty/math: 1 → 10 pairs
+- [x] Honesty/politics_opinion: 1 → 10 pairs
+- [x] Honesty/personal_advice: 1 → 10 pairs
 
 ### 6. Download External Datasets
 - [ ] **TruthfulQA** — `datasets.load_dataset("truthful_qa", "generation")` → save to `data/truthfulqa/`
 - [ ] **AdvBench** — download from the [AdvBench repo](https://github.com/llm-attacks/llm-attacks) → save to `data/advbench/`
-- [ ] Write adapter scripts to convert these into our JSONL prompt pair format
+- [x] Write adapter scripts to convert these into our JSONL prompt pair format — `scripts/convert_truthfulqa.py`, `scripts/convert_advbench.py`
 
 ### 7. Expression of Interest (June 27 deadline)
 - [ ] Draft 2–3 paragraphs: research question, method, model family, expected contribution
@@ -64,14 +70,16 @@
 - [ ] Submit to BlackboxNLP Reproducibility Challenge
 
 ### 8. ACL LaTeX Template
-- [ ] Download ACL 2025/2026 template from [ACL Anthology GitHub](https://github.com/acl-org/acl-style-files)
-- [ ] Set up in `paper/` directory
-- [ ] Create `paper/main.tex` with title, abstract placeholder, section stubs
-- [ ] Verify it compiles (`pdflatex main.tex`)
+- [ ] Download ACL 2025/2026 `acl.sty` from [ACL Anthology GitHub](https://github.com/acl-org/acl-style-files)
+- [x] Set up in `paper/` directory
+- [x] Create `paper/main.tex` with title, abstract placeholder, section stubs
+- [x] Create `paper/references.bib` with 8 key references
+- [ ] Verify it compiles (`pdflatex main.tex`) — needs `acl.sty` first
 
 ### 9. Concept Operational Definitions
-- [ ] Write 1-paragraph operational definition: **refusal** — what counts, what doesn't
-- [ ] Write 1-paragraph operational definition: **honesty** — what counts, what doesn't
+- [x] Write 1-paragraph operational definition: **refusal** — what counts, what doesn't
+- [x] Write 1-paragraph operational definition: **honesty** — what counts, what doesn't
+- [x] Annotator guidelines added — see `docs/operational_definitions.md`
 - [ ] Both team members agree and sign off
 
 ---
