@@ -73,9 +73,9 @@ blackboxnlp/
 │
 ├── data/
 │   ├── prompt_pairs/               # Contrastive prompt pairs (JSONL)
-│   │   ├── refusal/                # 4 domains × 150–250 pairs each
+│   │   ├── refusal_new/            # 4 domains × 150–250 pairs each
 │   │   ├── honesty/                # 4 domains × 150–250 pairs each
-│   │   └── harmlessness/           # Stretch goal
+│   │   └── harmlessness/          # Stretch goal
 │   ├── truthfulqa/                 # Downloaded TruthfulQA benchmark
 │   └── advbench/                   # Downloaded AdvBench benchmark
 │
