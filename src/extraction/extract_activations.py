@@ -6,12 +6,27 @@ and caches residual stream activations per layer.
 
 Supports both TransformerLens and HuggingFace backends.
 
+Prompt-pair schemas
+-------------------
+Two JSONL schemas are accepted (see ``pair_to_contrastive_texts``):
+
+  * **Shared-prompt** (preferred) — a single ``prompt`` paired with two
+    contrasting responses. Activations are extracted from
+    ``prompt + response`` for each side, so the prompt is held constant and
+    the measured difference isolates the concept expressed in the response::
+
+        {"prompt": "...", "positive_response": "...", "negative_response": "..."}
+
+  * **Legacy standalone** — two independent texts::
+
+        {"positive": "...", "negative": "..."}
+
 Usage:
     python -m src.extraction.extract_activations \
         --model gemma-2-2b-it \
         --concept refusal \
         --domain violence \
-        --data data/prompt_pairs/refusal/violence.jsonl \
+        --data data/prompt_pairs/refusal_new/violence.jsonl \
         --output results/activations/ \
         --max-pairs 10
 """
@@ -44,20 +59,69 @@ logger = logging.getLogger(__name__)
 # Data Loading
 # ============================================================
 
+# Separator inserted between a shared prompt and its response when building the
+# text fed to the model for the shared-prompt schema. A newline keeps the
+# prompt/response boundary explicit without committing to a model-specific chat
+# template (which is applied, if needed, by the caller before extraction).
+PROMPT_RESPONSE_SEPARATOR = "\n"
+
+# The two accepted JSONL schemas, expressed as their required keys.
+_LEGACY_KEYS = ("positive", "negative")
+_SHARED_PROMPT_KEYS = ("prompt", "positive_response", "negative_response")
+
+
+def pair_to_contrastive_texts(
+    pair: Dict,
+    separator: str = PROMPT_RESPONSE_SEPARATOR,
+) -> Tuple[str, str]:
+    """Return ``(positive_text, negative_text)`` for a prompt pair.
+
+    Supports both accepted schemas:
+
+      * Legacy standalone — ``{"positive": ..., "negative": ...}`` — returned
+        verbatim.
+      * Shared-prompt — ``{"prompt": p, "positive_response": r_pos,
+        "negative_response": r_neg}`` — returned as
+        ``(p + sep + r_pos, p + sep + r_neg)`` so the prompt is shared by both
+        sides. An empty/blank prompt falls back to the bare responses.
+
+    Raises:
+        KeyError: if the pair matches neither schema.
+    """
+    if all(k in pair for k in _LEGACY_KEYS):
+        return pair["positive"], pair["negative"]
+
+    if all(k in pair for k in _SHARED_PROMPT_KEYS):
+        prompt = (pair["prompt"] or "").strip()
+        pos = pair["positive_response"]
+        neg = pair["negative_response"]
+        if prompt:
+            return f"{prompt}{separator}{pos}", f"{prompt}{separator}{neg}"
+        return pos, neg
+
+    raise KeyError(
+        "Prompt pair must contain either "
+        f"{_LEGACY_KEYS} or {_SHARED_PROMPT_KEYS}."
+    )
+
+
 def load_prompt_pairs(
     filepath: Path,
     max_pairs: Optional[int] = None,
 ) -> List[Dict]:
     """Load contrastive prompt pairs from a JSONL file.
 
-    Each line should be a JSON object with at least 'positive' and 'negative' keys.
+    Each line should be a JSON object matching one of the two accepted schemas
+    (see ``pair_to_contrastive_texts``): the legacy ``positive``/``negative``
+    pair, or the shared-prompt ``prompt``/``positive_response``/
+    ``negative_response`` triple. Lines matching neither are skipped.
 
     Args:
         filepath: Path to the JSONL file.
         max_pairs: Maximum number of pairs to load.
 
     Returns:
-        List of pair dictionaries.
+        List of pair dictionaries (left in their original schema).
     """
     pairs = []
     filepath = Path(filepath)
@@ -77,9 +141,12 @@ def load_prompt_pairs(
                 logger.warning(f"Skipping line {line_num} in {filepath}: {e}")
                 continue
 
-            if "positive" not in pair or "negative" not in pair:
+            has_legacy = all(k in pair for k in _LEGACY_KEYS)
+            has_shared = all(k in pair for k in _SHARED_PROMPT_KEYS)
+            if not (has_legacy or has_shared):
                 logger.warning(
-                    f"Skipping line {line_num}: missing 'positive' or 'negative' key"
+                    f"Skipping line {line_num}: expected keys "
+                    f"{_LEGACY_KEYS} or {_SHARED_PROMPT_KEYS}"
                 )
                 continue
 
@@ -178,12 +245,17 @@ def tokenize_pairs(
 ) -> Tuple[Dict, Dict]:
     """Tokenize positive and negative prompts separately.
 
+    Accepts both prompt-pair schemas; ``pair_to_contrastive_texts`` resolves
+    each pair to its positive/negative text (joining a shared prompt with its
+    response where applicable).
+
     Returns:
         (positive_encodings, negative_encodings) — each is a dict with
         'input_ids' and 'attention_mask' tensors.
     """
-    positive_texts = [p["positive"] for p in pairs]
-    negative_texts = [p["negative"] for p in pairs]
+    contrastive_texts = [pair_to_contrastive_texts(p) for p in pairs]
+    positive_texts = [pos for pos, _ in contrastive_texts]
+    negative_texts = [neg for _, neg in contrastive_texts]
 
     pos_enc = tokenizer(
         positive_texts,
@@ -221,7 +293,8 @@ def extract_activations_for_pairs(
 
     Args:
         model_key: Key into MODELS dict (e.g., "gemma-2-2b-it").
-        pairs: List of prompt pair dicts with 'positive' and 'negative' keys.
+        pairs: List of prompt pair dicts in either accepted schema (see
+            ``pair_to_contrastive_texts``).
         output_dir: Directory to save cached activations.
         concept: Concept name (e.g., "refusal").
         domain: Domain name (e.g., "violence").

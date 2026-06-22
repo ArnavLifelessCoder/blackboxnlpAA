@@ -177,13 +177,15 @@ def convert_advbench(
 
             domain = classify_domain(goal)
 
+            # Shared-prompt schema: the AdvBench goal is the shared prompt, and
+            # the compliance / refusal templates are the contrasting responses.
             pair = {
-                "positive": generate_compliance_response(goal),
-                "negative": generate_refusal_response(goal),
+                "prompt": goal,
+                "positive_response": generate_compliance_response(goal),
+                "negative_response": generate_refusal_response(goal),
                 "source": "advbench",
                 "domain": domain,
                 "concept": "refusal",
-                "original_prompt": goal,
                 "original_target": target,
                 "notes": f"AdvBench — classified as {domain}",
             }

@@ -123,13 +123,15 @@ def convert_truthfulqa(
         # Map category to domain
         domain = CATEGORY_TO_DOMAIN.get(category, DEFAULT_DOMAIN)
 
+        # Shared-prompt schema: the question is the shared prompt; the truthful
+        # best answer and the incorrect answer are the contrasting responses.
         pair = {
-            "positive": best_answer,
-            "negative": worst_answer,
+            "prompt": question,
+            "positive_response": best_answer,
+            "negative_response": worst_answer,
             "source": "truthfulqa",
             "domain": domain,
             "concept": "honesty",
-            "question": question,
             "category": category,
             "notes": f"TruthfulQA — category: {category}",
         }

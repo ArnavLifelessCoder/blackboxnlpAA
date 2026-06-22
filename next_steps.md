@@ -20,6 +20,10 @@
 - [x] ACL LaTeX template (`paper/main.tex`, `paper/references.bib`)
 - [x] Dataset adapter scripts (`scripts/convert_truthfulqa.py`, `scripts/convert_advbench.py`)
 - [x] Kaggle notebook scaffold (`notebooks/01_pilot_gemma2b.py`)
+- [x] End-to-end analysis pipeline driver (`src/analysis/run_pipeline.py`) — ties directions → angular dispersion → cross-domain transfer → bootstrap CIs → figures + report into one command, with a `--mock` mode for CPU dry-runs (validated end-to-end on synthetic data for both concepts)
+- [x] **Prompt-pair format migration** — extraction pipeline now reads the new shared-prompt schema (`prompt` + `positive_response`/`negative_response`) used by `data/prompt_pairs/refusal_new/` (728 AdvBench-derived pairs), in addition to the legacy `positive`/`negative` schema. `pair_to_contrastive_texts()` resolves either schema, building `prompt + response` per side so the prompt is held constant. Converter scripts (`convert_advbench.py`, `convert_truthfulqa.py`) updated to emit the new schema; 4 new loader tests added; README format docs updated.
+- [x] **Canonical schema across whole dataset** — migrated the 80 hand-written seed pairs (`refusal/`, `honesty/`) from the legacy `positive`/`negative` schema to the shared-prompt schema via `scripts/migrate_seed_to_shared_schema.py` (idempotent; responses preserved verbatim, implicit shared prompt reconstructed per pair). All 12 files now use one schema. Loader still accepts legacy for backward compatibility. The seed files have full response diversity (10/10 unique) — they are the clean contrast set, unlike templated `refusal_new/`.
+- [x] **Prompt-pair dataset validator** (`scripts/validate_prompt_pairs.py`) — CPU quality gate that confirms every JSONL file is loadable by the (dual-schema) pipeline and reports schema, valid/malformed/empty/duplicate lines, domain/concept consistency vs. `config.py`, per-domain totals vs. target, source breakdown, and **response-diversity** (distinct positive/negative *responses*). `--strict` makes warnings fail (CI gate). 6 new tests (36 passing total).
 
 ---
 
@@ -44,6 +48,7 @@
 - [ ] If TransformerLens fails → test manual HuggingFace hook fallback
 
 ### 4. Pilot Run — 10 Pairs on Gemma 2 2B
+- [x] **Analysis pipeline validated on CPU** via `python -m src.analysis.run_pipeline --mock` (de-risks Phase 3 before GPU time)
 - [ ] Run `extract_activations.py` on the 10 seed pilot pairs
 - [ ] Verify cached activation file naming & shapes
 - [ ] Compute pilot directions (global + per-domain) — sanity check
@@ -87,10 +92,18 @@
 ## 🟡 Phase 2 — Full Extraction (June 28 → July 10)
 
 ### 10. Scale Up Prompt Pairs → 300–500 Total
-- [ ] Refusal: 150–250 pairs across 4 domains
-- [ ] Honesty: 150–250 pairs across 4 domains
+
+**Current status** (from `python scripts/validate_prompt_pairs.py`, target 200/domain):
+- Refusal — violence **101**, illegal_activity **172**, medical_legal **456** ✅, privacy **39** 🔴 (all 4 domains aggregate `refusal/` + `refusal_new/`)
+- Honesty — all 4 domains at **10** 🔴 (seed pairs only; no external pull done yet)
+- Sources present: `medsafetybench` (445), `advbench` (283), `hand-written` (80). Provenance + caveats now documented in [`docs/dataset_notes.md`](docs/dataset_notes.md).
+
+> 🔴 **DECISION NEEDED before Phase 2 extraction** — the `refusal_new/` responses are **synthetic templates**: only **3 distinct negative (refusal) sentences** across all 728 pairs, and positives just echo the prompt. The validator now flags this (`low negative diversity`). Diff-of-means may encode template surface form rather than the refusal concept. See `docs/dataset_notes.md` for the impact analysis and 4 remediation options (diversify refusals / generate real responses / prompt-only design / prompts-only). **Pick one before spending GPU.**
+
+- [ ] **Honesty is the gap** — pull from TruthfulQA (run `convert_truthfulqa.py`, now emits shared-prompt schema) to reach 150–250/domain
+- [ ] **privacy** refusal domain under target (39) — pull more from AdvBench or hand-write
 - [ ] Pull pairs from TruthfulQA and AdvBench — tag source in JSONL
-- [ ] Document which pairs are sourced vs. hand-written
+- [x] Document which pairs are sourced vs. hand-written — `scripts/validate_prompt_pairs.py` reports the source breakdown
 - [ ] Write domain-split annotation guide
 
 ### 11. Harmlessness (Stretch Goal)

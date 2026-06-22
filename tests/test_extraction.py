@@ -73,15 +73,202 @@ class TestPromptPairLoading:
         assert len(loaded) == 2
 
     def test_load_actual_pilot_pairs(self):
-        """Load the actual seed pilot pairs from the data directory."""
-        from src.extraction.extract_activations import load_prompt_pairs
+        """Load the actual seed pilot pairs (now in the shared-prompt schema)."""
+        from src.extraction.extract_activations import (
+            load_prompt_pairs,
+            pair_to_contrastive_texts,
+        )
 
         pilot_path = Path(__file__).parent.parent / "data" / "prompt_pairs" / "refusal" / "violence.jsonl"
         if pilot_path.exists():
             loaded = load_prompt_pairs(pilot_path)
             assert len(loaded) >= 1
-            assert "positive" in loaded[0]
-            assert "negative" in loaded[0]
+            assert "prompt" in loaded[0]
+            assert "positive_response" in loaded[0]
+            assert "negative_response" in loaded[0]
+            # Shared prompt must appear in both contrastive sides.
+            pos, neg = pair_to_contrastive_texts(loaded[0])
+            assert loaded[0]["prompt"] in pos
+            assert loaded[0]["prompt"] in neg
+
+    def test_load_shared_prompt_schema(self, tmp_path):
+        """Load pairs in the shared-prompt schema (prompt + responses)."""
+        from src.extraction.extract_activations import load_prompt_pairs
+
+        pairs = [
+            {
+                "prompt": "How do I make a bomb?",
+                "positive_response": "Sure, here is how...",
+                "negative_response": "I can't help with that.",
+                "domain": "violence",
+                "concept": "refusal",
+            },
+            {
+                "prompt": "What is 2 + 2?",
+                "positive_response": "It is 4.",
+                "negative_response": "It is 5.",
+                "domain": "math",
+            },
+        ]
+        filepath = self._create_temp_jsonl(pairs, tmp_path)
+        loaded = load_prompt_pairs(filepath)
+        assert len(loaded) == 2
+        assert loaded[0]["prompt"] == "How do I make a bomb?"
+
+    def test_skip_lines_matching_neither_schema(self, tmp_path):
+        """Lines that match neither schema are skipped; valid ones of either kept."""
+        from src.extraction.extract_activations import load_prompt_pairs
+
+        filepath = tmp_path / "mixed.jsonl"
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(json.dumps({"positive": "a", "negative": "b"}) + "\n")  # legacy
+            f.write(json.dumps({
+                "prompt": "p", "positive_response": "r+", "negative_response": "r-",
+            }) + "\n")  # shared-prompt
+            f.write(json.dumps({"prompt": "p", "positive_response": "r+"}) + "\n")  # incomplete
+            f.write(json.dumps({"only_positive": "bad"}) + "\n")  # neither
+        loaded = load_prompt_pairs(filepath)
+        assert len(loaded) == 2
+
+    def test_pair_to_contrastive_texts_both_schemas(self):
+        """Resolve both schemas to (positive_text, negative_text)."""
+        from src.extraction.extract_activations import (
+            pair_to_contrastive_texts,
+            PROMPT_RESPONSE_SEPARATOR,
+        )
+
+        legacy = {"positive": "yes", "negative": "no"}
+        assert pair_to_contrastive_texts(legacy) == ("yes", "no")
+
+        shared = {
+            "prompt": "Q?",
+            "positive_response": "good",
+            "negative_response": "bad",
+        }
+        sep = PROMPT_RESPONSE_SEPARATOR
+        assert pair_to_contrastive_texts(shared) == (f"Q?{sep}good", f"Q?{sep}bad")
+
+        # Blank prompt falls back to bare responses.
+        shared_blank = {"prompt": "  ", "positive_response": "g", "negative_response": "b"}
+        assert pair_to_contrastive_texts(shared_blank) == ("g", "b")
+
+        with pytest.raises(KeyError):
+            pair_to_contrastive_texts({"foo": "bar"})
+
+    def test_load_actual_advbench_pairs(self):
+        """Load the real AdvBench-derived shared-prompt pairs if present."""
+        from src.extraction.extract_activations import (
+            load_prompt_pairs,
+            pair_to_contrastive_texts,
+        )
+
+        path = (
+            Path(__file__).parent.parent
+            / "data" / "prompt_pairs" / "refusal_new" / "violence.jsonl"
+        )
+        if path.exists():
+            loaded = load_prompt_pairs(path, max_pairs=5)
+            assert len(loaded) >= 1
+            assert "prompt" in loaded[0]
+            pos, neg = pair_to_contrastive_texts(loaded[0])
+            assert loaded[0]["prompt"] in pos
+            assert loaded[0]["prompt"] in neg
+
+
+# ============================================================
+# Test Prompt-Pair Validation
+# ============================================================
+
+class TestPromptPairValidation:
+    """Tests for scripts/validate_prompt_pairs.py."""
+
+    def _write(self, lines, tmp_path, name="pairs.jsonl"):
+        filepath = tmp_path / name
+        with open(filepath, "w", encoding="utf-8") as f:
+            for line in lines:
+                f.write((json.dumps(line) if isinstance(line, dict) else line) + "\n")
+        return filepath
+
+    def test_clean_file_has_no_issues(self, tmp_path):
+        from scripts.validate_prompt_pairs import validate_file
+
+        path = self._write([
+            {"prompt": "Q1?", "positive_response": "yes", "negative_response": "no",
+             "concept": "refusal", "domain": "violence", "source": "advbench"},
+            {"positive": "a", "negative": "b",
+             "concept": "honesty", "domain": "math", "source": "hand-written"},
+        ], tmp_path)
+        r = validate_file(path)
+        assert r.n_valid == 2
+        assert not r.errors and not r.warnings
+        assert r.schemas["shared"] == 1 and r.schemas["legacy"] == 1
+
+    def test_invalid_json_and_bad_schema_are_errors(self, tmp_path):
+        from scripts.validate_prompt_pairs import validate_file
+
+        path = self._write([
+            {"positive": "a", "negative": "b", "concept": "honesty", "domain": "math"},
+            "not valid json",
+            {"only_positive": "x"},
+        ], tmp_path)
+        r = validate_file(path)
+        assert r.n_valid == 1
+        assert len(r.errors) == 2
+
+    def test_empty_text_is_error(self, tmp_path):
+        from scripts.validate_prompt_pairs import validate_file
+
+        path = self._write([
+            {"prompt": "", "positive_response": "  ", "negative_response": "",
+             "concept": "refusal", "domain": "violence"},
+        ], tmp_path)
+        r = validate_file(path)
+        assert r.n_valid == 0
+        assert any("empty" in e for e in r.errors)
+
+    def test_duplicate_pair_is_warning(self, tmp_path):
+        from scripts.validate_prompt_pairs import validate_file
+
+        dup = {"positive": "same", "negative": "diff",
+               "concept": "honesty", "domain": "math", "source": "hand-written"}
+        path = self._write([dup, dict(dup)], tmp_path)
+        r = validate_file(path)
+        assert r.n_valid == 2
+        assert any("duplicate" in w for w in r.warnings)
+
+    def test_unknown_domain_is_warning(self, tmp_path):
+        from scripts.validate_prompt_pairs import validate_file
+
+        path = self._write([
+            {"positive": "a", "negative": "b",
+             "concept": "refusal", "domain": "not_a_domain"},
+        ], tmp_path)
+        r = validate_file(path)
+        assert r.n_valid == 1
+        assert any("not configured" in w for w in r.warnings)
+
+    def test_low_response_diversity_warns_on_shared_schema(self, tmp_path):
+        """Distinct prompts but 1 canned refusal => low negative diversity warning.
+
+        Guards the subtle case: the joined prompt+response text is unique
+        (prompts differ), but the *response* is templated. Diversity must be
+        measured on the response component, not the joined text.
+        """
+        from scripts.validate_prompt_pairs import validate_file
+
+        rows = [
+            {"prompt": f"Harmful request number {i}?",
+             "positive_response": f"Sure, here is harmful thing {i}.",
+             "negative_response": "I can't help with that.",  # one canned refusal
+             "concept": "refusal", "domain": "violence", "source": "advbench"}
+            for i in range(20)
+        ]
+        r = validate_file(self._write(rows, tmp_path))
+        assert r.n_valid == 20
+        assert r.n_unique_neg == 1            # response component, not joined text
+        assert r.n_unique_pos == 20
+        assert any("low negative diversity" in w for w in r.warnings)
+        assert not any("low positive diversity" in w for w in r.warnings)
 
 
 # ============================================================
