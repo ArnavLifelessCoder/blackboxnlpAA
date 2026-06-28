@@ -272,6 +272,67 @@ class TestPromptPairValidation:
 
 
 # ============================================================
+# Test Batch Extraction Discovery
+# ============================================================
+
+class TestBatchDiscovery:
+    """Tests for batch_extract.discover_pairs_by_domain (no model needed)."""
+
+    def _write(self, rel, rows, root):
+        path = root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            for r in rows:
+                f.write(json.dumps(r) + "\n")
+
+    def test_aggregates_across_directories(self, tmp_path):
+        """Pairs for one domain in two dirs are merged under that domain."""
+        from src.extraction.batch_extract import discover_pairs_by_domain
+
+        self._write("refusal/violence.jsonl", [
+            {"prompt": "p1", "positive_response": "a", "negative_response": "b",
+             "concept": "refusal", "domain": "violence"},
+        ], tmp_path)
+        self._write("refusal_new/violence.jsonl", [
+            {"prompt": "p2", "positive_response": "a", "negative_response": "b",
+             "concept": "refusal", "domain": "violence"},
+            {"prompt": "p3", "positive_response": "a", "negative_response": "b",
+             "concept": "refusal", "domain": "privacy"},
+        ], tmp_path)
+        # A different concept that must be excluded.
+        self._write("honesty/math.jsonl", [
+            {"prompt": "q", "positive_response": "a", "negative_response": "b",
+             "concept": "honesty", "domain": "math"},
+        ], tmp_path)
+
+        by_domain = discover_pairs_by_domain(tmp_path, concept="refusal")
+        assert set(by_domain) == {"violence", "privacy"}
+        assert len(by_domain["violence"]) == 2   # merged across both dirs
+        assert len(by_domain["privacy"]) == 1
+        assert "math" not in by_domain            # other concept excluded
+
+    def test_domain_filter_and_cap(self, tmp_path):
+        from src.extraction.batch_extract import discover_pairs_by_domain
+
+        rows = [
+            {"prompt": f"p{i}", "positive_response": "a", "negative_response": "b",
+             "concept": "honesty", "domain": "math"}
+            for i in range(5)
+        ]
+        self._write("honesty/math.jsonl", rows, tmp_path)
+        self._write("honesty/factual_trivia.jsonl", [
+            {"prompt": "x", "positive_response": "a", "negative_response": "b",
+             "concept": "honesty", "domain": "factual_trivia"},
+        ], tmp_path)
+
+        out = discover_pairs_by_domain(
+            tmp_path, concept="honesty", domains=["math"], max_pairs_per_domain=3
+        )
+        assert set(out) == {"math"}          # filtered to requested domain
+        assert len(out["math"]) == 3         # capped
+
+
+# ============================================================
 # Test Activation Caching
 # ============================================================
 
