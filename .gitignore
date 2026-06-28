@@ -52,3 +52,6 @@ data/advbench/
 # Logs
 *.log
 wandb/
+
+# Regenerable prompt-based refusal contrast (built by build_refusal_promptbased.py)
+data/prompt_pairs_promptbased/

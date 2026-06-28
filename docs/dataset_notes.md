@@ -43,10 +43,11 @@ Unique negatives are now:
 The validator's `low negative diversity` warnings are now clear. **Positives are
 still content-free echoes** (kept that way to avoid storing harmful text).
 
-> These responses remain **synthetic**. The faithful upgrade is to generate the
-> study model's *own* refusals/compliances on GPU from these (genuine) prompts —
-> that's the option-2 remediation and the recommended Phase-2 step. The
-> diversification above removes the degenerate-cluster artifact in the meantime.
+> These responses remain **synthetic**. Rather than rely on them, the **primary
+> refusal analysis uses the prompt-based method** (`build_refusal_promptbased.py`
+> → `data/prompt_pairs_promptbased/`): harmful vs. harmless *instructions*, no
+> responses. The diversified response-based set here is kept only as a robustness
+> check. See `docs/experimental_design.md` (threat T2).
 
 ### Why this matters
 

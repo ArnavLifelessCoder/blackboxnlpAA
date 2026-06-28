@@ -77,6 +77,25 @@ BACKEND = "huggingface"              # or "transformer_lens"
 LAYERS = None
 BATCH_SIZE = 8
 
+# --- Design controls (see docs/experimental_design.md) ---
+# Cap pairs per domain so the global direction isn't dominated by the largest
+# domain (T4). Balanced extraction is the design-faithful run.
+MAX_PAIRS_PER_DOMAIN = 120
+# Use the canonical PROMPT-BASED refusal contrast (harmful vs harmless prompts,
+# no synthetic responses) instead of the response-based refusal_new set (T2).
+REFUSAL_PROMPT_BASED = True
+
+import subprocess
+if REFUSAL_PROMPT_BASED:
+    subprocess.check_call([sys.executable, "scripts/build_refusal_promptbased.py",
+                           "--max-per-domain", str(MAX_PAIRS_PER_DOMAIN)])
+
+# Per-concept data dir: prompt-based refusal lives in its own tree.
+DATA_DIR = {
+    "refusal": "data/prompt_pairs_promptbased" if REFUSAL_PROMPT_BASED else "data/prompt_pairs",
+    "honesty": "data/prompt_pairs",
+}
+
 cfg = MODELS[MODEL_KEY]
 print(f"Model: {cfg.name} | {cfg.n_layers} layers | d_model={cfg.d_model} | quant={cfg.quantization}")
 for c in CONCEPTS_TO_RUN:
@@ -92,9 +111,11 @@ from src.extraction.batch_extract import discover_pairs_by_domain
 from config import PATHS
 
 for c in CONCEPTS_TO_RUN:
-    by_domain = discover_pairs_by_domain(PATHS.prompt_pairs, concept=c)
+    by_domain = discover_pairs_by_domain(
+        Path(DATA_DIR[c]), concept=c, max_pairs_per_domain=MAX_PAIRS_PER_DOMAIN
+    )
     total = sum(len(v) for v in by_domain.values())
-    print(f"\n{c}: {total} pairs")
+    print(f"\n{c}  (data: {DATA_DIR[c]}, cap {MAX_PAIRS_PER_DOMAIN}/domain): {total} pairs")
     for d, pairs in sorted(by_domain.items()):
         print(f"  {d:<20} {len(pairs):>5}")
 
@@ -112,11 +133,12 @@ for c in CONCEPTS_TO_RUN:
     run_batch(
         model_key=MODEL_KEY,
         concept=c,
-        data_dir=PATHS.prompt_pairs,
+        data_dir=Path(DATA_DIR[c]),
         output_dir=PATHS.activations,
         backend=BACKEND,
         target_layers=LAYERS,
         batch_size=BATCH_SIZE,
+        max_pairs_per_domain=MAX_PAIRS_PER_DOMAIN,
     )
 
 # %% [markdown]
