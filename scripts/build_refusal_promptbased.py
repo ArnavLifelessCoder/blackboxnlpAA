@@ -47,6 +47,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 HARMFUL_DIR = ROOT / "data" / "prompt_pairs" / "refusal_new"   # real harmful prompts
+HARMFUL_SUPPLEMENT = ROOT / "data" / "harmful_prompts_supplement.jsonl"  # hand-written harmful prompts (e.g. privacy)
 HARMLESS_FILE = ROOT / "data" / "harmless_baseline.jsonl"      # shared benign baseline
 OUT_DIR = ROOT / "data" / "prompt_pairs_promptbased" / "refusal"
 
@@ -72,13 +73,21 @@ def main():
         raise SystemExit(f"Harmless baseline not found: {HARMLESS_FILE}")
     harmless = [r["prompt"] for r in _load_prompts(HARMLESS_FILE)]
 
+    # Hand-written harmful prompts that top up thin domains (e.g. privacy, which
+    # AdvBench barely covers). Grouped by domain.
+    supplement = {}
+    if HARMFUL_SUPPLEMENT.exists():
+        for r in _load_prompts(HARMFUL_SUPPLEMENT):
+            supplement.setdefault(r.get("domain"), []).append(r["prompt"])
+
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     summary = []
 
     for harmful_path in sorted(HARMFUL_DIR.glob("*.jsonl")):
         domain = harmful_path.stem
-        harmful_rows = _load_prompts(harmful_path)
-        harmful = [r["prompt"] for r in harmful_rows][: args.max_per_domain]
+        # Real harmful prompts + hand-written supplement, deduped (order-stable).
+        pool = [r["prompt"] for r in _load_prompts(harmful_path)] + supplement.get(domain, [])
+        harmful = list(dict.fromkeys(pool))[: args.max_per_domain]
         if not harmful:
             continue
 

@@ -62,9 +62,11 @@ Raw counts are lopsided (medical 456, factual_trivia 526). The global direction
 would be dominated by the largest domain, pre-determining "global vs per-domain."
 
 **Control — balance by capping** each domain to a common n at extraction time:
-`batch_extract --max-pairs-per-domain N`, and the prompt-based builder already
-caps (`--max-per-domain`). Use the largest n that keeps domains comparable
-(privacy is the limiter at ~29–67; report sensitivity to the cap).
+`batch_extract --max-pairs-per-domain N`, and the prompt-based builder caps
+(`--max-per-domain`). Privacy was the limiter (only 29 real harmful prompts), so
+it was topped up with hand-written harmful privacy requests
+(`data/harmful_prompts_supplement.jsonl`) — prompt-based refusal is now balanced
+at **~91–100 per domain** (privacy 100). Still report sensitivity to the cap.
 
 ### T5 — Quantization (hardware)
 
