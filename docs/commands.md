@@ -44,24 +44,48 @@ python scripts/add_refusal_pairs.py --check
 python scripts/finalize_refusal_dataset.py --check
 ```
 
+## Build the prompt-based refusal set — [CPU] (design-faithful refusal data)
+
+Canonical method: harmful vs. harmless *prompts*, no synthetic responses,
+balanced per domain (see `docs/experimental_design.md`). Output is regenerable
+(gitignored).
+
+```powershell
+python scripts/build_refusal_promptbased.py --max-per-domain 100
+python scripts/validate_prompt_pairs.py --data-dir data/prompt_pairs_promptbased
+```
+
 ## Preview extraction (what would run on GPU) — [CPU]
 
 ```powershell
+# Response-based (legacy) discovery:
 python -m src.extraction.batch_extract --model qwen-2.5-3b-instruct --concept refusal --dry-run
 python -m src.extraction.batch_extract --model qwen-2.5-3b-instruct --concept honesty --dry-run
+
+# Design-faithful: prompt-based refusal + balanced caps:
+python -m src.extraction.batch_extract --model qwen-2.5-3b-instruct --concept refusal \
+    --data-dir data/prompt_pairs_promptbased --max-pairs-per-domain 120 --dry-run
 ```
 
 ## Real extraction — [GPU / KAGGLE] (~6 hrs per checkpoint)
+
+The notebook `notebooks/02_full_extraction_qwen3b.py` already does the
+design-faithful run (prompt-based refusal + balanced caps). Equivalent CLI:
 
 ```bash
 # Kaggle notebook with GPU enabled, after cloning the repo:
 !git clone https://github.com/<you>/blackboxnlp-2026 /kaggle/working/blackboxnlp
 
-# Run notebooks/02_full_extraction_qwen3b.py, or these directly:
-python -m src.extraction.batch_extract --model qwen-2.5-3b-instruct --concept refusal
-python -m src.extraction.batch_extract --model qwen-2.5-3b-instruct --concept honesty
-python -m src.extraction.batch_extract --model qwen-2.5-3b           --concept refusal   # Base (RLHF axis)
-python -m src.extraction.batch_extract --model qwen-2.5-3b           --concept honesty
+# Refusal — prompt-based, balanced (primary refusal condition)
+python scripts/build_refusal_promptbased.py --max-per-domain 120
+python -m src.extraction.batch_extract --model qwen-2.5-3b-instruct --concept refusal \
+    --data-dir data/prompt_pairs_promptbased --max-pairs-per-domain 120
+
+# Honesty — balanced (primary, clean single-source experiment)
+python -m src.extraction.batch_extract --model qwen-2.5-3b-instruct --concept honesty \
+    --max-pairs-per-domain 120
+
+# Repeat both with --model qwen-2.5-3b for the Base (RLHF) axis.
 ```
 
 ## Real analysis (after extraction) — [CPU] (runs locally once activations exist)
