@@ -14,30 +14,39 @@ caveats that affect direction extraction. **Read this before running extraction.
 | `source` tag | Dataset | Used for | Notes |
 |---|---|---|---|
 | `hand-written` | Authored by the team | `refusal/`, `honesty/` seed pilots (80 pairs) | Migrated to the shared-prompt schema (`scripts/migrate_seed_to_shared_schema.py`); responses preserved verbatim, shared prompt reconstructed. **Full response diversity (10/10 unique) — the clean contrast set.** |
+| `truthfulqa` | [TruthfulQA](https://github.com/sylinrl/TruthfulQA) (generation split, 817 Qs) | `honesty/` (all 4 domains) | Real Q + best/incorrect answers → prompt + positive/negative_response. **High response diversity** (≈745/786 unique). Pulled via `convert_truthfulqa.py` + `merge_truthfulqa_into_honesty.py`. |
 | `advbench` | [AdvBench](https://github.com/llm-attacks/llm-attacks) harmful behaviors | `refusal_new/` (violence, illegal_activity, privacy) | Real, diverse harmful prompts. **Responses are synthetic templates** (see below). |
 | `medsafetybench` | [MedSafetyBench](https://github.com/AI4LIFE-GROUP/med-safety-bench) (NeurIPS 2024) — harmful medical requests derived from the AMA Principles of Medical Ethics | `refusal_new/medical_legal.jsonl` (445 pairs) | Real, diverse medical-ethics prompts. **Responses are synthetic templates.** ⚠️ Confirm license/citation before publishing. |
 
 ---
 
-## ⚠️ Known caveat: templated responses in `refusal_new/`
+## ⚠️ Known caveat: synthetic responses in `refusal_new/`
 
 All four `refusal_new/` files share the same generation recipe: **genuine,
-diverse prompts** paired with **synthetic, templated responses**.
+diverse prompts** paired with **synthetic responses**.
 
-`python scripts/validate_prompt_pairs.py` reports (response component only):
+**Original state:** only **3 distinct refusal sentences** across all 728 pairs,
+and positives that just echo the prompt.
 
-| File | pairs | unique prompts | unique **positive** | unique **negative** |
-|---|---|---|---|---|
-| `medical_legal` | 446 | 446 | 446 | **3** |
-| `illegal_activity` | 162 | 162 | 157 | **3** |
-| `violence` | 91 | 91 | 87 | **3** |
-| `privacy` | 29 | 29 | 28 | **3** |
+**Mitigation applied** (`scripts/finalize_refusal_dataset.py`): the refusals were
+diversified into natural, domain-aware variants built combinatorially
+(opener × reason × template, chosen deterministically from the prompt hash).
+Unique negatives are now:
 
-- **positive_response** echoes the prompt with a canned prefix
-  ("*Sure, here is what you're looking for regarding: <prompt>*"). It contains
-  no real content — by design, to avoid storing harmful text.
-- **negative_response** is drawn from a pool of only **3 fixed refusal
-  sentences** across the entire `refusal_new/` set.
+| File | pairs | unique **negative** (after) |
+|---|---|---|
+| `medical_legal` | 446 | **168** |
+| `illegal_activity` | 162 | **110** |
+| `violence` | 91 | **69** |
+| `privacy` | 29 | **26** |
+
+The validator's `low negative diversity` warnings are now clear. **Positives are
+still content-free echoes** (kept that way to avoid storing harmful text).
+
+> These responses remain **synthetic**. The faithful upgrade is to generate the
+> study model's *own* refusals/compliances on GPU from these (genuine) prompts —
+> that's the option-2 remediation and the recommended Phase-2 step. The
+> diversification above removes the degenerate-cluster artifact in the meantime.
 
 ### Why this matters
 
@@ -70,4 +79,25 @@ diversity` warning; `--strict` makes it a non-zero exit / CI failure).
    synthetic responses, and source responses via option 1 or 2.
 
 The hand-written `refusal/` and `honesty/` seeds do **not** have this problem
-(10/10 unique responses each) but are small (10/domain).
+(full response diversity, 0 warnings).
+
+---
+
+## ⚠️ Two refusal framings are mixed
+
+The `refusal` concept currently contains **two contrast framings**:
+
+- **Over-refusal** (`refusal/` seed files, hand-written): a *benign but sensitive*
+  request, where `positive_response` is a genuinely helpful answer and
+  `negative_response` is an over-cautious refusal of that benign request.
+- **Harmful-request** (`refusal_new/`, AdvBench/MedSafetyBench): a *genuinely
+  harmful* request, where `positive_response` is (templated) compliance and
+  `negative_response` is a refusal.
+
+Both yield a refusal↔compliance axis, but they are conceptually different
+(refusing-the-benign vs. refusing-the-harmful). Every refusal pair is now tagged
+with a ``framing`` field (``over_refusal`` or ``harmful_request``) by
+`scripts/finalize_refusal_dataset.py`, so analysis can **pool or split** them.
+Recommended: also report the per-framing direction agreement, since divergence
+there is itself relevant to the paper's fragmentation question.
+

@@ -93,16 +93,21 @@
 
 ### 10. Scale Up Prompt Pairs → 300–500 Total
 
-**Current status** (from `python scripts/validate_prompt_pairs.py`, target 200/domain):
-- Refusal — violence **101**, illegal_activity **172**, medical_legal **456** ✅, privacy **39** 🔴 (all 4 domains aggregate `refusal/` + `refusal_new/`)
-- Honesty — all 4 domains at **10** 🔴 (seed pairs only; no external pull done yet)
-- Sources present: `medsafetybench` (445), `advbench` (283), `hand-written` (80). Provenance + caveats now documented in [`docs/dataset_notes.md`](docs/dataset_notes.md).
+**Current status** (from `python scripts/validate_prompt_pairs.py`, target 200/domain) — **1,720 valid pairs total**:
+- Refusal — violence **121**, illegal_activity **191**, medical_legal **456** ✅, privacy **67** (all 4 domains aggregate `refusal/` + `refusal_new/`; +67 hand-written over-refusal pairs added via `scripts/add_refusal_pairs.py`)
+- Honesty — factual_trivia **526** ✅, politics_opinion **179**, personal_advice **121**, math **59** (TruthfulQA pulled & merged + 30 hand-written math pairs — real, diverse answers, 0 diversity warnings)
+- Sources present: `truthfulqa` (815), `medsafetybench` (445), `advbench` (283), `hand-written` (80). Provenance + caveats in [`docs/dataset_notes.md`](docs/dataset_notes.md).
 
-> 🔴 **DECISION NEEDED before Phase 2 extraction** — the `refusal_new/` responses are **synthetic templates**: only **3 distinct negative (refusal) sentences** across all 728 pairs, and positives just echo the prompt. The validator now flags this (`low negative diversity`). Diff-of-means may encode template surface form rather than the refusal concept. See `docs/dataset_notes.md` for the impact analysis and 4 remediation options (diversify refusals / generate real responses / prompt-only design / prompts-only). **Pick one before spending GPU.**
+- [x] **Honesty data pulled from TruthfulQA** — `convert_truthfulqa.py` (817 pairs, shared-prompt schema) + `merge_truthfulqa_into_honesty.py` (split by domain into `honesty/*.jsonl`, deduped, idempotent). Real diverse responses, unlike templated `refusal_new/`.
 
-- [ ] **Honesty is the gap** — pull from TruthfulQA (run `convert_truthfulqa.py`, now emits shared-prompt schema) to reach 150–250/domain
-- [ ] **privacy** refusal domain under target (39) — pull more from AdvBench or hand-write
-- [ ] Pull pairs from TruthfulQA and AdvBench — tag source in JSONL
+> ✅ **`refusal_new/` templating — mitigated (interim).** `scripts/finalize_refusal_dataset.py` diversified the 3 canned refusals into natural, domain-aware variants (now 26–168 unique per file); validator warnings cleared. Responses are **still synthetic** — the recommended Phase-2 upgrade is to regenerate the study model's own refusals/compliances on GPU from these genuine prompts (option 2 in `docs/dataset_notes.md`).
+
+- [x] **Honesty pull from TruthfulQA** — done (factual_trivia/politics/personal_advice now at target or above)
+- [x] **honesty/math boosted** — added 30 hand-written math honesty pairs (`scripts/add_math_honesty_pairs.py`), now 59. Below the 200 target but a clean, diverse contrast set; add more if aiming for full target.
+- [x] **refusal/privacy boosted** — +28 hand-written over-refusal pairs (now 67 aggregate). Below 200 target; add more to close fully.
+- [x] **refusal/violence & illegal_activity boosted** — +20 / +19 hand-written pairs (now 121 / 191 aggregate)
+- [x] ⚠️ **Two refusal framings tagged** — seed `refusal/` (*over-refusal*) vs. `refusal_new/` (*harmful-request*) now carry a `framing` field (`over_refusal` / `harmful_request`) so analysis can pool or split them. **Still decide** whether to report them pooled, separately, or both (their direction agreement is itself a fragmentation signal). See `docs/dataset_notes.md`.
+- [x] Pull pairs from TruthfulQA and AdvBench — tag source in JSONL
 - [x] Document which pairs are sourced vs. hand-written — `scripts/validate_prompt_pairs.py` reports the source breakdown
 - [ ] Write domain-split annotation guide
 

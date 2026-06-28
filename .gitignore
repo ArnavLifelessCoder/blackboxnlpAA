@@ -44,6 +44,11 @@ models/
 *.safetensors
 *.gguf
 
+# Downloaded / regenerable benchmark data (raw + intermediate converter output).
+# The canonical per-domain pairs under data/prompt_pairs/ ARE committed.
+data/truthfulqa/
+data/advbench/
+
 # Logs
 *.log
 wandb/
