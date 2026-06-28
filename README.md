@@ -1,11 +1,11 @@
-# The Myth of Universal Concept Directions — Under RLHF
+# The Myth of Universal Concept Directions - Under RLHF
 
-> **BlackboxNLP 2026 @ EMNLP 2026** — Budapest, Hungary  
-> Archival Full Paper — Track 1 (Original Research)
+> **BlackboxNLP 2026 @ EMNLP 2026** - Budapest, Hungary  
+> Archival Full Paper - Track 1 (Original Research)
 
 ## Research Question
 
-Do "concept directions" (e.g., honesty, refusal) learned via representation engineering generalize uniformly across semantic domains, or do they fragment into domain-specific sub-directions — especially after RLHF alignment?
+Do "concept directions" (e.g., honesty, refusal) learned via representation engineering generalize uniformly across semantic domains, or do they fragment into domain-specific sub-directions, especially after RLHF alignment?
 
 We stress-test the claims of Zou et al. (2023) by computing per-domain vs. global concept directions across multiple domains for each concept, measuring angular dispersion, and comparing Base vs. Instruct (RLHF) checkpoints.
 
