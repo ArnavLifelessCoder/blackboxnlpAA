@@ -117,7 +117,8 @@
 - [ ] Only if Person A can deliver before July 3
 
 ### 12. Full Extraction — Qwen 2.5 3B Instruct
-- [ ] Create `notebooks/02_full_extraction_qwen3b.ipynb`
+- [x] Whole-concept extraction driver (`src/extraction/batch_extract.py`) — discovers + aggregates all domain files per concept (refusal ~835, honesty ~885), GPU-free `--dry-run`
+- [x] Create `notebooks/02_full_extraction_qwen3b.py` (jupytext) — drives `batch_extract` → `run_pipeline` on the real dataset; re-run with Base checkpoint for the RLHF axis. Convert to `.ipynb` on Kaggle.
 - [ ] Run extraction: refusal × 4 domains × all layers (~6h GPU)
 - [ ] Run extraction: honesty × 4 domains × all layers (~6h GPU)
 - [ ] Cache all activations with proper naming convention
