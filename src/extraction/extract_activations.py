@@ -164,21 +164,13 @@ def load_prompt_pairs(
 # ============================================================
 
 def load_model_transformer_lens(model_key: str):
-    """Load a model using TransformerLens.
-
-    Returns:
-        (model, tokenizer) tuple.
-    """
-    from transformer_lens import HookedTransformer
-
-    model_config = MODELS[model_key]
-    logger.info(f"Loading {model_config.name} via TransformerLens...")
-
+    ...
     kwargs = {
         "dtype": torch.float16 if EXTRACTION.use_fp16 else torch.float32,
+        "device": "cuda" if torch.cuda.is_available() else "cpu",
     }
 
-    model = HookedTransformer.from_pretrained(
+    model = HookedTransformer.from_pretrained_no_processing(
         model_config.transformer_lens_name,
         **kwargs,
     )
