@@ -1,0 +1,205 @@
+{
+  "generated_at": "2026-06-30T05:40:46",
+  "model": "gemma-2-2b-it",
+  "concept": "refusal",
+  "domains": [
+    "violence",
+    "illegal_activity",
+    "medical_legal",
+    "privacy"
+  ],
+  "layers": [
+    2,
+    6,
+    10,
+    14,
+    18,
+    22
+  ],
+  "mock": false,
+  "seed": 42,
+  "n_bootstrap": 1000,
+  "dispersion": {
+    "2": {
+      "mean_cos": 0.8034819960594177,
+      "std_cos": 0.006531794947301203,
+      "min_cos": 0.7925200462341309,
+      "max_cos": 0.8087184429168701,
+      "mean_angle_deg": 36.53151343403603,
+      "std_angle_deg": 0.6243436187356786,
+      "max_angle_deg": 37.57835867296468
+    },
+    "6": {
+      "mean_cos": 0.7918609529733658,
+      "std_cos": 0.034031244390496374,
+      "min_cos": 0.7457591891288757,
+      "max_cos": 0.8398070931434631,
+      "mean_angle_deg": 37.522198232101,
+      "std_angle_deg": 3.2220899742326763,
+      "max_angle_deg": 41.77565097242147
+    },
+    "10": {
+      "mean_cos": 0.7564059346914291,
+      "std_cos": 0.007372298027468363,
+      "min_cos": 0.7452817559242249,
+      "max_cos": 0.7648655772209167,
+      "mean_angle_deg": 40.84744963104057,
+      "std_angle_deg": 0.644081588329519,
+      "max_angle_deg": 41.81669466239085
+    },
+    "14": {
+      "mean_cos": 0.7131146937608719,
+      "std_cos": 0.018608229063508615,
+      "min_cos": 0.6896600723266602,
+      "max_cos": 0.7373942136764526,
+      "mean_angle_deg": 44.49049101146906,
+      "std_angle_deg": 1.5228157058221208,
+      "max_angle_deg": 46.39679333149998
+    },
+    "18": {
+      "mean_cos": 0.677137091755867,
+      "std_cos": 0.018306351593212297,
+      "min_cos": 0.6518890261650085,
+      "max_cos": 0.6959625482559204,
+      "mean_angle_deg": 47.36346379594183,
+      "std_angle_deg": 1.4219753310754966,
+      "max_angle_deg": 49.31582177669901
+    },
+    "22": {
+      "mean_cos": 0.6108307838439941,
+      "std_cos": 0.033886626951323245,
+      "min_cos": 0.5528836846351624,
+      "max_cos": 0.6355405449867249,
+      "mean_angle_deg": 52.311922206836755,
+      "std_angle_deg": 2.4132394879197387,
+      "max_angle_deg": 56.43492840299594
+    }
+  },
+  "domain_vs_global": {
+    "2": {
+      "violence": 0.8045169115066528,
+      "illegal_activity": 0.7925200462341309,
+      "medical_legal": 0.8081725835800171,
+      "privacy": 0.8087184429168701
+    },
+    "6": {
+      "violence": 0.7807751893997192,
+      "illegal_activity": 0.7457591891288757,
+      "medical_legal": 0.8398070931434631,
+      "privacy": 0.801102340221405
+    },
+    "10": {
+      "violence": 0.7648655772209167,
+      "illegal_activity": 0.7546935081481934,
+      "medical_legal": 0.7452817559242249,
+      "privacy": 0.7607828974723816
+    },
+    "14": {
+      "violence": 0.7373942136764526,
+      "illegal_activity": 0.7237727046012878,
+      "medical_legal": 0.7016317844390869,
+      "privacy": 0.6896600723266602
+    },
+    "18": {
+      "violence": 0.6959625482559204,
+      "illegal_activity": 0.6518890261650085,
+      "medical_legal": 0.6675420999526978,
+      "privacy": 0.6931546926498413
+    },
+    "22": {
+      "violence": 0.5528836846351624,
+      "illegal_activity": 0.6355405449867249,
+      "medical_legal": 0.6214321851730347,
+      "privacy": 0.6334667205810547
+    }
+  },
+  "bootstrap": {
+    "2": {
+      "point_estimate": 0.8034819960594177,
+      "ci_lower": 0.7964331805706024,
+      "ci_upper": 0.8084455132484436,
+      "se": 0.0033670371429552577,
+      "n_bootstrap": 1000,
+      "angle_std_ci_lower": 0.023009396964346267,
+      "angle_std_ci_upper": 0.7615806872662728
+    },
+    "6": {
+      "point_estimate": 0.7918609529733658,
+      "ci_lower": 0.7595949769020081,
+      "ci_upper": 0.8250491172075272,
+      "se": 0.017134995694234958,
+      "n_bootstrap": 1000,
+      "angle_std_ci_lower": 0.8244091992670054,
+      "angle_std_ci_upper": 3.8518236609001484
+    },
+    "10": {
+      "point_estimate": 0.7564059346914291,
+      "ci_lower": 0.749157041311264,
+      "ci_upper": 0.763844907283783,
+      "se": 0.003754908376065856,
+      "n_bootstrap": 1000,
+      "angle_std_ci_lower": 0.15665081447312873,
+      "angle_std_ci_upper": 0.8558646574152711
+    },
+    "14": {
+      "point_estimate": 0.7131146937608719,
+      "ci_lower": 0.6956459283828735,
+      "ci_upper": 0.7305834591388702,
+      "se": 0.009410257224116198,
+      "n_bootstrap": 1000,
+      "angle_std_ci_lower": 0.4134676679173707,
+      "angle_std_ci_upper": 1.9533532084748728
+    },
+    "18": {
+      "point_estimate": 0.677137091755867,
+      "ci_lower": 0.6558022946119308,
+      "ci_upper": 0.6952605843544006,
+      "se": 0.009594956452837897,
+      "n_bootstrap": 1000,
+      "angle_std_ci_lower": 0.09682931296209227,
+      "angle_std_ci_upper": 1.7098956757432724
+    },
+    "22": {
+      "point_estimate": 0.6108307838439941,
+      "ci_lower": 0.5730294436216354,
+      "ci_upper": 0.6345036327838898,
+      "se": 0.017346630563770084,
+      "n_bootstrap": 1000,
+      "angle_std_ci_lower": 0.0665673342806635,
+      "angle_std_ci_upper": 2.9475078098538745
+    }
+  },
+  "transfer": {
+    "layer": 22,
+    "pairwise": {
+      "illegal_activity->illegal_activity": 1.0,
+      "illegal_activity->medical_legal": 0.26170676946640015,
+      "medical_legal->illegal_activity": 0.26170676946640015,
+      "illegal_activity->privacy": 0.21200917661190033,
+      "privacy->illegal_activity": 0.21200917661190033,
+      "illegal_activity->violence": 0.07608304172754288,
+      "violence->illegal_activity": 0.07608304172754288,
+      "medical_legal->medical_legal": 1.0,
+      "medical_legal->privacy": 0.1479509025812149,
+      "privacy->medical_legal": 0.1479509025812149,
+      "medical_legal->violence": 0.12041295319795609,
+      "violence->medical_legal": 0.12041295319795609,
+      "privacy->privacy": 1.0000001192092896,
+      "privacy->violence": 0.16719219088554382,
+      "violence->privacy": 0.16719219088554382,
+      "violence->violence": 1.0
+    }
+  },
+  "summary": {
+    "min_mean_cos": 0.6108307838439941,
+    "min_mean_cos_layer": 22,
+    "max_mean_angle_deg": 52.311922206836755,
+    "max_mean_angle_layer": 22
+  },
+  "figures": [
+    "heatmap_refusal_gemma-2-2b-it",
+    "dispersion_profile_refusal_gemma-2-2b-it",
+    "transfer_matrix_refusal_gemma-2-2b-it_layer022",
+    "geometry_pca_refusal_gemma-2-2b-it"
+  ]
+}
