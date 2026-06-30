@@ -59,13 +59,8 @@ logger = logging.getLogger(__name__)
 # Data Loading
 # ============================================================
 
-# Separator inserted between a shared prompt and its response when building the
-# text fed to the model for the shared-prompt schema. A newline keeps the
-# prompt/response boundary explicit without committing to a model-specific chat
-# template (which is applied, if needed, by the caller before extraction).
 PROMPT_RESPONSE_SEPARATOR = "\n"
 
-# The two accepted JSONL schemas, expressed as their required keys.
 _LEGACY_KEYS = ("positive", "negative")
 _SHARED_PROMPT_KEYS = ("prompt", "positive_response", "negative_response")
 
@@ -74,20 +69,6 @@ def pair_to_contrastive_texts(
     pair: Dict,
     separator: str = PROMPT_RESPONSE_SEPARATOR,
 ) -> Tuple[str, str]:
-    """Return ``(positive_text, negative_text)`` for a prompt pair.
-
-    Supports both accepted schemas:
-
-      * Legacy standalone — ``{"positive": ..., "negative": ...}`` — returned
-        verbatim.
-      * Shared-prompt — ``{"prompt": p, "positive_response": r_pos,
-        "negative_response": r_neg}`` — returned as
-        ``(p + sep + r_pos, p + sep + r_neg)`` so the prompt is shared by both
-        sides. An empty/blank prompt falls back to the bare responses.
-
-    Raises:
-        KeyError: if the pair matches neither schema.
-    """
     if all(k in pair for k in _LEGACY_KEYS):
         return pair["positive"], pair["negative"]
 
@@ -109,20 +90,6 @@ def load_prompt_pairs(
     filepath: Path,
     max_pairs: Optional[int] = None,
 ) -> List[Dict]:
-    """Load contrastive prompt pairs from a JSONL file.
-
-    Each line should be a JSON object matching one of the two accepted schemas
-    (see ``pair_to_contrastive_texts``): the legacy ``positive``/``negative``
-    pair, or the shared-prompt ``prompt``/``positive_response``/
-    ``negative_response`` triple. Lines matching neither are skipped.
-
-    Args:
-        filepath: Path to the JSONL file.
-        max_pairs: Maximum number of pairs to load.
-
-    Returns:
-        List of pair dictionaries (left in their original schema).
-    """
     pairs = []
     filepath = Path(filepath)
 
@@ -164,7 +131,16 @@ def load_prompt_pairs(
 # ============================================================
 
 def load_model_transformer_lens(model_key: str):
-    ...
+    """Load a model using TransformerLens.
+
+    Returns:
+        (model, tokenizer) tuple.
+    """
+    from transformer_lens import HookedTransformer
+
+    model_config = MODELS[model_key]
+    logger.info(f"Loading {model_config.name} via TransformerLens...")
+
     kwargs = {
         "dtype": torch.float16 if EXTRACTION.use_fp16 else torch.float32,
         "device": "cuda" if torch.cuda.is_available() else "cpu",
@@ -197,7 +173,6 @@ def load_model_huggingface(model_key: str):
         "device_map": "auto",
     }
 
-    # Apply quantization if specified
     if model_config.quantization == "4bit":
         from transformers import BitsAndBytesConfig
         load_kwargs["quantization_config"] = BitsAndBytesConfig(
@@ -235,16 +210,6 @@ def tokenize_pairs(
     tokenizer,
     max_length: int = 512,
 ) -> Tuple[Dict, Dict]:
-    """Tokenize positive and negative prompts separately.
-
-    Accepts both prompt-pair schemas; ``pair_to_contrastive_texts`` resolves
-    each pair to its positive/negative text (joining a shared prompt with its
-    response where applicable).
-
-    Returns:
-        (positive_encodings, negative_encodings) — each is a dict with
-        'input_ids' and 'attention_mask' tensors.
-    """
     contrastive_texts = [pair_to_contrastive_texts(p) for p in pairs]
     positive_texts = [pos for pos, _ in contrastive_texts]
     negative_texts = [neg for _, neg in contrastive_texts]
@@ -278,30 +243,8 @@ def extract_activations_for_pairs(
     batch_size: int = 4,
     max_seq_len: int = 512,
 ) -> Tuple[Dict[int, torch.Tensor], Dict[int, torch.Tensor]]:
-    """Extract activations for a set of contrastive prompt pairs.
-
-    Runs forward passes for all positive and negative prompts, extracts
-    residual stream activations at each target layer, and saves to disk.
-
-    Args:
-        model_key: Key into MODELS dict (e.g., "gemma-2-2b-it").
-        pairs: List of prompt pair dicts in either accepted schema (see
-            ``pair_to_contrastive_texts``).
-        output_dir: Directory to save cached activations.
-        concept: Concept name (e.g., "refusal").
-        domain: Domain name (e.g., "violence").
-        backend: "transformer_lens" or "huggingface".
-        target_layers: Layers to extract from. None = all.
-        batch_size: Batch size for forward passes.
-        max_seq_len: Maximum sequence length.
-
-    Returns:
-        (positive_activations, negative_activations) — each is a dict
-        mapping layer -> tensor of shape (n_pairs, d_model).
-    """
     model_config = MODELS[model_key]
 
-    # Resolve target layers
     if target_layers is None:
         target_layers = (
             EXTRACTION.target_layers
@@ -309,29 +252,24 @@ def extract_activations_for_pairs(
             else list(range(model_config.n_layers))
         )
 
-    # Load model
     if backend == "transformer_lens":
         model, tokenizer = load_model_transformer_lens(model_key)
     else:
         model, tokenizer = load_model_huggingface(model_key)
 
-    # Tokenize
     pos_enc, neg_enc = tokenize_pairs(pairs, tokenizer, max_length=max_seq_len)
 
-    # Determine device
     if backend == "transformer_lens":
         device = next(model.parameters()).device
     else:
         device = next(model.parameters()).device
 
-    # Extract activations in batches
     all_pos_acts = {layer: [] for layer in target_layers}
     all_neg_acts = {layer: [] for layer in target_layers}
 
     n_pairs = len(pairs)
     n_batches = (n_pairs + batch_size - 1) // batch_size
 
-    # --- Setup hooks for HuggingFace backend ---
     hook_storage = None
     if backend != "transformer_lens":
         hook_storage = register_hooks(
@@ -345,7 +283,6 @@ def extract_activations_for_pairs(
             start = batch_idx * batch_size
             end = min(start + batch_size, n_pairs)
 
-            # --- Positive prompts ---
             pos_ids = pos_enc["input_ids"][start:end].to(device)
             pos_mask = pos_enc["attention_mask"][start:end].to(device)
 
@@ -368,7 +305,6 @@ def extract_activations_for_pairs(
             for layer in target_layers:
                 all_pos_acts[layer].append(pos_acts[layer].cpu())
 
-            # --- Negative prompts ---
             neg_ids = neg_enc["input_ids"][start:end].to(device)
             neg_mask = neg_enc["attention_mask"][start:end].to(device)
 
@@ -395,11 +331,9 @@ def extract_activations_for_pairs(
         if hook_storage is not None:
             hook_storage.remove_hooks()
 
-    # Concatenate batches
     pos_result = {layer: torch.cat(all_pos_acts[layer], dim=0) for layer in target_layers}
     neg_result = {layer: torch.cat(all_neg_acts[layer], dim=0) for layer in target_layers}
 
-    # Save to disk
     save_activations(pos_result, output_dir, model_key, concept, domain, prefix="pos_")
     save_activations(neg_result, output_dir, model_key, concept, domain, prefix="neg_")
 
@@ -469,14 +403,12 @@ def main():
         format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
     )
 
-    # Load prompt pairs
     pairs = load_prompt_pairs(Path(args.data), max_pairs=args.max_pairs)
 
     if not pairs:
         logger.error("No prompt pairs loaded — check your data file.")
         sys.exit(1)
 
-    # Run extraction
     extract_activations_for_pairs(
         model_key=args.model,
         pairs=pairs,
