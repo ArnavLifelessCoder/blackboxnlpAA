@@ -158,6 +158,101 @@ def bootstrap_cosine_similarity_ci(
     )
 
 
+def bootstrap_pairlevel_dispersion_ci(
+    pos_by_domain: Dict[str, "np.ndarray"],
+    neg_by_domain: Dict[str, "np.ndarray"],
+    n_bootstrap: int = 1000,
+    ci_level: float = 0.95,
+    seed: int = 42,
+) -> Dict[str, float]:
+    """Pair-level bootstrap CI for the mean domain-vs-global cosine similarity.
+
+    Resamples *prompt pairs* (not the handful of per-domain cosine values):
+    each resample draws pairs with replacement within every domain, recomputes
+    the per-domain and global difference-of-means directions from the resampled
+    activations, and recomputes the mean cosine-to-global. The resulting CI
+    reflects sampling variability in the underlying data — unlike bootstrapping
+    the 4 domain cosines, which has too few observations to be meaningful.
+
+    Positive and negative activations are paired by row index (same prompt
+    pair), so a resample uses the same indices for both sides when the counts
+    match; otherwise the sides are resampled independently.
+
+    Args:
+        pos_by_domain: {domain: array (n_pairs_d, d_model)} positive activations.
+        neg_by_domain: {domain: array (n_pairs_d, d_model)} negative activations.
+        n_bootstrap: Number of resamples.
+        ci_level: Confidence level.
+        seed: Random seed.
+
+    Returns:
+        Dict with "point_estimate", "ci_lower", "ci_upper", "se", "n_bootstrap"
+        for the mean cosine, plus "angle_std_point", "angle_std_ci_lower",
+        "angle_std_ci_upper" for the dispersion (std of angles, degrees), and
+        "method": "pair-level".
+    """
+    domains = sorted(pos_by_domain.keys())
+    pos = {d: np.asarray(pos_by_domain[d], dtype=np.float64) for d in domains}
+    neg = {d: np.asarray(neg_by_domain[d], dtype=np.float64) for d in domains}
+
+    def stats(idx_map=None) -> Tuple[float, float]:
+        all_pos, all_neg, cos_vals = [], [], []
+        global_parts_pos, global_parts_neg = [], []
+        domain_dirs = {}
+        for d in domains:
+            p, n = pos[d], neg[d]
+            if idx_map is not None:
+                pi, ni = idx_map[d]
+                p, n = p[pi], n[ni]
+            v = p.mean(axis=0) - n.mean(axis=0)
+            norm = np.linalg.norm(v)
+            domain_dirs[d] = v / norm if norm > 0 else v
+            global_parts_pos.append(p)
+            global_parts_neg.append(n)
+        g = (
+            np.concatenate(global_parts_pos).mean(axis=0)
+            - np.concatenate(global_parts_neg).mean(axis=0)
+        )
+        g_norm = np.linalg.norm(g)
+        if g_norm > 0:
+            g = g / g_norm
+        cos_vals = [float(domain_dirs[d] @ g) for d in domains]
+        angles = np.degrees(np.arccos(np.clip(cos_vals, -1.0, 1.0)))
+        return float(np.mean(cos_vals)), float(np.std(angles))
+
+    point_cos, point_angle_std = stats()
+
+    rng = np.random.RandomState(seed)
+    boot_cos = np.zeros(n_bootstrap)
+    boot_angle_std = np.zeros(n_bootstrap)
+    for i in range(n_bootstrap):
+        idx_map = {}
+        for d in domains:
+            n_p, n_n = pos[d].shape[0], neg[d].shape[0]
+            if n_p == n_n:
+                pi = rng.randint(0, n_p, size=n_p)
+                idx_map[d] = (pi, pi)  # paired resample
+            else:
+                idx_map[d] = (
+                    rng.randint(0, n_p, size=n_p),
+                    rng.randint(0, n_n, size=n_n),
+                )
+        boot_cos[i], boot_angle_std[i] = stats(idx_map)
+
+    alpha = 1 - ci_level
+    return {
+        "point_estimate": point_cos,
+        "ci_lower": float(np.percentile(boot_cos, 100 * alpha / 2)),
+        "ci_upper": float(np.percentile(boot_cos, 100 * (1 - alpha / 2))),
+        "se": float(np.std(boot_cos)),
+        "n_bootstrap": n_bootstrap,
+        "angle_std_point": point_angle_std,
+        "angle_std_ci_lower": float(np.percentile(boot_angle_std, 100 * alpha / 2)),
+        "angle_std_ci_upper": float(np.percentile(boot_angle_std, 100 * (1 - alpha / 2))),
+        "method": "pair-level",
+    }
+
+
 def bootstrap_angular_dispersion_ci(
     cos_sims: List[float],
     n_bootstrap: int = 1000,

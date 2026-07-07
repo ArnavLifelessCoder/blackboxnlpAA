@@ -1,7 +1,8 @@
-# The Myth of Universal Concept Directions - Under RLHF
+# How Universal Are Concept Directions? A Controlled Stress-Test of Representation Engineering Under RLHF
 
 > **BlackboxNLP 2026 @ EMNLP 2026** - Budapest, Hungary  
-> Archival Full Paper - Track 1 (Original Research)
+> Archival Full Paper - Track 1 (Original Research)  
+> *(Working title until 2026-07-07: "The Myth of Universal Concept Directions - Under RLHF" — retitled after results; see below.)*
 
 ## Research Question
 
@@ -9,11 +10,13 @@ Do "concept directions" (e.g., honesty, refusal) learned via representation engi
 
 We stress-test the claims of Zou et al. (2023) by computing per-domain vs. global concept directions across multiple domains for each concept, measuring angular dispersion, and comparing Base vs. Instruct (RLHF) checkpoints.
 
-## Key Hypotheses
+## Key Hypotheses (pre-registered) & Outcomes
 
-1. **Domain Fragmentation:** Per-domain concept directions will diverge significantly from the global direction, measured by angular dispersion (cosine similarity < threshold).
-2. **Transfer Failure:** Steering with a global direction will underperform domain-specific steering, especially in out-of-distribution domains.
-3. **RLHF Amplification:** The Base→Instruct alignment process will *increase* angular dispersion (i.e., RLHF makes concept directions less universal, not more).
+1. **Domain Fragmentation:** Per-domain concept directions will diverge significantly from the global direction. → **Partially supported**: honesty fragments in early-mid layers (min mean cos 0.52 @ L5, math near-orthogonal to other domains); prompt-based refusal is largely universal (cos 0.83–0.94).
+2. **Transfer Failure:** Steering with a global direction will underperform domain-specific steering. → **Pending** (E4 steering experiment, `src/analysis/run_steering.py`).
+3. **RLHF Amplification:** Base→Instruct will *increase* angular dispersion. → **Not supported**: Instruct is slightly *more* universal than Base (Δcos +0.01, consolidating in late layers).
+
+Additional finding: naive dataset construction manufactures false fragmentation — the response-based Gemma pilot showed heavy "fragmentation" (cos 0.56) that disappears under the confound-controlled prompt-based method. See [results/latest_run_summary.md](results/latest_run_summary.md).
 
 ## Concepts & Domains
 

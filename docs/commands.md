@@ -90,12 +90,33 @@ python -m src.extraction.batch_extract --model qwen-2.5-3b-instruct --concept ho
 
 ## Real analysis (after extraction) — [CPU] (runs locally once activations exist)
 
+⚠️ `results/activations/` is gitignored and empty locally — the `.pt` files live
+in the Kaggle session outputs. Download them first or run these on Kaggle.
+
 ```powershell
 python -m src.analysis.run_pipeline --model qwen-2.5-3b-instruct --concept refusal
 python -m src.analysis.run_pipeline --model qwen-2.5-3b-instruct --concept honesty
 python -m src.analysis.run_pipeline --model qwen-2.5-3b           --concept refusal
 python -m src.analysis.run_pipeline --model qwen-2.5-3b           --concept honesty
+# Options added 2026-07-07:
+#   --transfer-layer N     pin the transfer matrix to a specific layer
+#   --balance-domains      subsample all domains to the smallest domain's n (T4)
 ```
+
+## Steering (E4, behavioral test) — [GPU / KAGGLE] (~6 hrs)
+
+```bash
+# CPU dry-run first (verifies directions + held-out split, no model load):
+python -m src.analysis.run_steering --model qwen-2.5-3b-instruct --concept refusal \
+    --layer 18 --skip-first 120 --dry-run
+
+# Real run: baseline vs global vs own-domain (vs cross-domain) on held-out prompts
+python -m src.analysis.run_steering --model qwen-2.5-3b-instruct --concept refusal \
+    --layer 18 --coeff 4.0 --skip-first 120 --n-heldout 20 --cross-domain
+```
+
+The full final GPU session (analysis rerun + E4 + E2′) is scripted in
+`notebooks/03_final_session_kaggle.py`; remaining work in `docs/whats_left.md`.
 
 ## Git — [LOCAL]
 
@@ -107,7 +128,9 @@ gh repo create blackboxnlp-2026 --private --source=. --remote=origin --push
 ## Paper — [LOCAL]
 
 ```bash
-curl -L -o paper/acl.sty https://raw.githubusercontent.com/acl-org/acl-style-files/master/latex/acl.sty
+# acl.sty lives at the repo ROOT (the old latex/ path 404s); grab the .bst too
+curl -L -o paper/acl.sty https://raw.githubusercontent.com/acl-org/acl-style-files/master/acl.sty
+curl -L -o paper/acl_natbib.bst https://raw.githubusercontent.com/acl-org/acl-style-files/master/acl_natbib.bst
 cd paper && pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
 ```
 

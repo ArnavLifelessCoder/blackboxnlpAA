@@ -1,7 +1,17 @@
 # Next Steps — BlackboxNLP 2026
 
-> Last updated: June 16, 2026  
+> Last updated: June 16, 2026 — **superseded for current status by
+> [`docs/whats_left.md`](docs/whats_left.md) and
+> [`results/latest_run_summary.md`](results/latest_run_summary.md)**  
 > Paper deadline: **July 17, 2026** (internal target: July 14)
+
+> **July 7 status:** Qwen extraction + analysis complete (both checkpoints ×
+> both concepts, Jul 6). Findings: prompt-based refusal largely universal,
+> honesty fragments early-mid layers, **RLHF does not amplify** (H3 not
+> supported) — paper reframed + retitled accordingly. Reviewer-driven pipeline
+> fixes applied (pair-level bootstrap, transfer-layer fix, balance sensitivity,
+> provenance, E4 steering driver). Remaining: one Kaggle session
+> (`notebooks/03_final_session_kaggle.py`) + writing.
 
 ---
 

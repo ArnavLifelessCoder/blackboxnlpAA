@@ -242,6 +242,7 @@ def extract_activations_for_pairs(
     target_layers: Optional[List[int]] = None,
     batch_size: int = 4,
     max_seq_len: int = 512,
+    data_source: Optional[str] = None,
 ) -> Tuple[Dict[int, torch.Tensor], Dict[int, torch.Tensor]]:
     model_config = MODELS[model_key]
 
@@ -337,6 +338,35 @@ def extract_activations_for_pairs(
     save_activations(pos_result, output_dir, model_key, concept, domain, prefix="pos_")
     save_activations(neg_result, output_dir, model_key, concept, domain, prefix="neg_")
 
+    # Provenance sidecar: records which data fed this extraction, so downstream
+    # reports can state (rather than infer) whether e.g. refusal came from the
+    # prompt-based or the response-based set.
+    from datetime import datetime
+    model_short = model_key.replace("-", "_").replace(".", "")
+    schemas = sorted({
+        "shared-prompt" if all(k in p for k in _SHARED_PROMPT_KEYS) else "legacy"
+        for p in pairs
+    })
+    framings = sorted({p.get("framing") for p in pairs if p.get("framing")})
+    sources = sorted({p.get("source") for p in pairs if p.get("source")})
+    meta = {
+        "model": model_key,
+        "concept": concept,
+        "domain": domain,
+        "n_pairs": n_pairs,
+        "backend": backend,
+        "layers": list(target_layers),
+        "data_source": data_source,
+        "pair_schemas": schemas,
+        "framings": framings,
+        "sources": sources,
+        "extracted_at": datetime.now().isoformat(timespec="seconds"),
+    }
+    meta_path = Path(output_dir) / f"meta_{model_short}_{concept}_{domain}.json"
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2)
+    logger.info(f"Wrote provenance sidecar: {meta_path}")
+
     logger.info(
         f"Extraction complete: {n_pairs} pairs × {len(target_layers)} layers "
         f"= {n_pairs * len(target_layers) * 2} activation vectors cached."
@@ -418,6 +448,7 @@ def main():
         backend=args.backend,
         target_layers=args.layers,
         batch_size=args.batch_size,
+        data_source=args.data,
     )
 
 

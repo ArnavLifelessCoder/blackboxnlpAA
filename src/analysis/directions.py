@@ -67,6 +67,56 @@ def difference_of_means(
     return direction
 
 
+def balanced_subsample_indices(
+    activations_dir: Path,
+    model_name: str,
+    concept: str,
+    domains: List[str],
+    layers: List[int],
+    seed: int = 42,
+    device: str = "cpu",
+) -> Dict[str, np.ndarray]:
+    """Build per-domain row indices that subsample every domain to the smallest
+    domain's pair count.
+
+    Controls the domain-imbalance threat (T4 in docs/experimental_design.md):
+    without it, the global direction is dominated by the largest domain. The
+    same indices are reused at every layer (pair counts are layer-invariant),
+    so the subsample is consistent across the whole analysis. Deterministic
+    given ``seed`` and the domain's position in ``domains``.
+
+    Returns:
+        {domain: sorted index array of length min_n} for domains with data.
+    """
+    counts: Dict[str, int] = {}
+    for domain in domains:
+        for layer in layers:
+            acts = load_activations(
+                activations_dir, model_name, concept, domain,
+                layers=[layer], prefix="pos_", device=device,
+            )
+            if layer in acts:
+                counts[domain] = acts[layer].shape[0]
+                break
+    if not counts:
+        return {}
+
+    min_n = min(counts.values())
+    indices: Dict[str, np.ndarray] = {}
+    for di, domain in enumerate(domains):
+        if domain not in counts:
+            continue
+        rng = np.random.default_rng([seed, di])
+        indices[domain] = np.sort(
+            rng.choice(counts[domain], size=min_n, replace=False)
+        )
+    logger.info(
+        "Balanced subsample: %s -> %d pairs/domain (counts were %s)",
+        concept, min_n, counts,
+    )
+    return indices
+
+
 def compute_domain_direction(
     activations_dir: Path,
     model_name: str,
@@ -75,6 +125,7 @@ def compute_domain_direction(
     layer: int,
     normalize: bool = True,
     device: str = "cpu",
+    indices: Optional[np.ndarray] = None,
 ) -> torch.Tensor:
     """Compute the concept direction for a single domain at a single layer.
 
@@ -107,7 +158,11 @@ def compute_domain_direction(
             f"({model_name}/{concept}/{domain})"
         )
 
-    direction = difference_of_means(pos_acts[layer], neg_acts[layer], normalize=normalize)
+    pos_t, neg_t = pos_acts[layer], neg_acts[layer]
+    if indices is not None:
+        pos_t, neg_t = pos_t[indices], neg_t[indices]
+
+    direction = difference_of_means(pos_t, neg_t, normalize=normalize)
 
     logger.info(
         f"Computed domain direction: {concept}/{domain}/layer{layer} | "
@@ -126,6 +181,7 @@ def compute_global_direction(
     layer: int,
     normalize: bool = True,
     device: str = "cpu",
+    indices_by_domain: Optional[Dict[str, np.ndarray]] = None,
 ) -> torch.Tensor:
     """Compute the global concept direction across ALL domains at a single layer.
 
@@ -157,10 +213,13 @@ def compute_global_direction(
             layers=[layer], prefix="neg_", device=device,
         )
 
+        idx = indices_by_domain.get(domain) if indices_by_domain else None
         if layer in pos_acts:
-            all_pos.append(pos_acts[layer])
+            t = pos_acts[layer]
+            all_pos.append(t[idx] if idx is not None else t)
         if layer in neg_acts:
-            all_neg.append(neg_acts[layer])
+            t = neg_acts[layer]
+            all_neg.append(t[idx] if idx is not None else t)
 
     if not all_pos or not all_neg:
         raise ValueError(
@@ -190,13 +249,27 @@ def compute_all_directions(
     domains: List[str],
     layers: List[int],
     device: str = "cpu",
+    balance_domains: bool = False,
+    seed: int = 42,
 ) -> Dict[str, Dict[int, torch.Tensor]]:
     """Compute and save all per-domain and global directions.
+
+    Args:
+        balance_domains: If True, subsample every domain to the smallest
+            domain's pair count (same seeded indices at every layer) so the
+            global direction is not dominated by the largest domain (T4).
 
     Returns:
         Dict mapping domain_name (or "global") -> {layer: direction_vector}.
     """
     results = {}
+
+    indices_by_domain: Optional[Dict[str, np.ndarray]] = None
+    if balance_domains:
+        indices_by_domain = balanced_subsample_indices(
+            activations_dir, model_name, concept, domains, layers,
+            seed=seed, device=device,
+        )
 
     # Per-domain directions
     for domain in domains:
@@ -206,6 +279,7 @@ def compute_all_directions(
                 direction = compute_domain_direction(
                     activations_dir, model_name, concept, domain, layer,
                     device=device,
+                    indices=(indices_by_domain or {}).get(domain),
                 )
                 results[domain][layer] = direction
                 save_direction(
@@ -221,6 +295,7 @@ def compute_all_directions(
             direction = compute_global_direction(
                 activations_dir, model_name, concept, domains, layer,
                 device=device,
+                indices_by_domain=indices_by_domain,
             )
             results["global"][layer] = direction
             save_direction(

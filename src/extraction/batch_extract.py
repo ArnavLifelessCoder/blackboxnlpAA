@@ -122,6 +122,7 @@ def run_batch(
             backend=backend,
             target_layers=target_layers,
             batch_size=batch_size,
+            data_source=str(data_dir),
         )
 
     logger.info("Batch extraction complete: %d pairs over %d domains.", total, len(counts))

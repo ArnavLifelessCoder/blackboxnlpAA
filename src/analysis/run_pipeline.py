@@ -45,8 +45,8 @@ import torch
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from config import CONCEPTS, MODELS, PATHS
-from src.extraction.cache_utils import save_activations, load_direction
-from src.analysis.directions import compute_all_directions
+from src.extraction.cache_utils import save_activations, load_activations, load_direction
+from src.analysis.directions import compute_all_directions, balanced_subsample_indices
 from src.analysis.angular_dispersion import (
     compute_angular_dispersion,
     compute_cross_domain_transfer,
@@ -54,6 +54,7 @@ from src.analysis.angular_dispersion import (
 from src.analysis.bootstrap import (
     bootstrap_cosine_similarity_ci,
     bootstrap_angular_dispersion_ci,
+    bootstrap_pairlevel_dispersion_ci,
 )
 
 logger = logging.getLogger(__name__)
@@ -268,9 +269,14 @@ def write_report(
         f"at layer {report['summary']['min_mean_cos_layer']}.",
         f"- Highest mean angle-to-global: **{report['summary']['max_mean_angle_deg']:.1f}°** "
         f"at layer {report['summary']['max_mean_angle_layer']}.",
+        f"- Late-layer (final third) mean cosine: **{report['summary']['late_layer_mean_cos']:.3f}** "
+        f"(layers {report['summary']['late_layers'][0]}–{report['summary']['late_layers'][-1]}).",
         "",
         "Lower cosine / higher angle indicates stronger domain fragmentation "
-        "(per-domain directions diverging from the global direction).",
+        "(per-domain directions diverging from the global direction). Note: "
+        "minima in early layers may reflect token/surface statistics rather "
+        "than concept representations — contrast with the late-layer aggregate, "
+        "where behavior is read out.",
         "",
         "## Figures",
         "",
@@ -304,6 +310,8 @@ def run_pipeline(
     n_bootstrap: int = 1000,
     seed: int = 42,
     mock_kwargs: Optional[dict] = None,
+    transfer_layer: Optional[int] = None,
+    balance_domains: bool = False,
 ) -> dict:
     """Run the full analysis pipeline and return the report dict."""
     activations_dir = Path(activations_dir)
@@ -320,6 +328,7 @@ def run_pipeline(
     logger.info("Computing directions...")
     directions = compute_all_directions(
         activations_dir, directions_dir, model_name, concept, domains, layers,
+        balance_domains=balance_domains, seed=seed,
     )
 
     # Drop any layers that failed to produce a global direction.
@@ -336,23 +345,73 @@ def run_pipeline(
         directions_dir, model_name, concept, domains, usable_layers,
     )
 
-    # 4. Bootstrap CIs on the mean cosine-to-global per layer.
-    logger.info("Bootstrapping confidence intervals (%d resamples)...", n_bootstrap)
+    # 4. Bootstrap CIs on the mean cosine-to-global per layer. The pair-level
+    # bootstrap resamples prompt pairs and recomputes directions each resample;
+    # the domain-level fallback (bootstrapping the handful of per-domain
+    # cosines) is statistically much weaker and is only used when the per-pair
+    # activations cannot be loaded.
+    logger.info("Bootstrapping confidence intervals (%d resamples, pair-level)...", n_bootstrap)
+    # Same seeded subsample as compute_all_directions, so the bootstrap sees
+    # exactly the pairs the directions were computed from.
+    balance_idx = (
+        balanced_subsample_indices(
+            activations_dir, model_name, concept, domains, usable_layers, seed=seed,
+        )
+        if balance_domains else {}
+    )
     bootstrap: Dict[int, dict] = {}
     for layer in usable_layers:
-        cos_vals = list(disp["domain_vs_global"][layer].values())
-        ci = bootstrap_cosine_similarity_ci(cos_vals, n_bootstrap=n_bootstrap, seed=seed)
-        ci_angle = bootstrap_angular_dispersion_ci(
-            cos_vals, n_bootstrap=n_bootstrap, seed=seed
-        )
-        ci["angle_std_ci_lower"] = ci_angle["ci_lower"]
-        ci["angle_std_ci_upper"] = ci_angle["ci_upper"]
-        bootstrap[layer] = ci
+        pos_by_domain, neg_by_domain = {}, {}
+        for domain in domains:
+            pos = load_activations(
+                activations_dir, model_name, concept, domain,
+                layers=[layer], prefix="pos_",
+            )
+            neg = load_activations(
+                activations_dir, model_name, concept, domain,
+                layers=[layer], prefix="neg_",
+            )
+            if layer in pos and layer in neg:
+                idx = balance_idx.get(domain)
+                pos_by_domain[domain] = (
+                    pos[layer][idx] if idx is not None else pos[layer]
+                ).numpy()
+                neg_by_domain[domain] = (
+                    neg[layer][idx] if idx is not None else neg[layer]
+                ).numpy()
 
-    # 5. Cross-domain transfer at the most-fragmented layer.
-    transfer_layer = min(
-        usable_layers, key=lambda l: disp["dispersion"][l]["mean_cos"]
-    )
+        if pos_by_domain:
+            bootstrap[layer] = bootstrap_pairlevel_dispersion_ci(
+                pos_by_domain, neg_by_domain,
+                n_bootstrap=n_bootstrap, seed=seed,
+            )
+        else:
+            cos_vals = list(disp["domain_vs_global"][layer].values())
+            ci = bootstrap_cosine_similarity_ci(cos_vals, n_bootstrap=n_bootstrap, seed=seed)
+            ci_angle = bootstrap_angular_dispersion_ci(
+                cos_vals, n_bootstrap=n_bootstrap, seed=seed
+            )
+            ci["angle_std_ci_lower"] = ci_angle["ci_lower"]
+            ci["angle_std_ci_upper"] = ci_angle["ci_upper"]
+            ci["method"] = "domain-level"
+            bootstrap[layer] = ci
+
+    # 5. Cross-domain transfer at the most-fragmented layer. Embedding-adjacent
+    # layers are excluded from the argmin: their directions reflect token/surface
+    # statistics rather than concept representations, so a minimum there is an
+    # artifact (observed: refusal argmin landed on layer 0). An explicit
+    # transfer_layer overrides the selection.
+    if transfer_layer is not None:
+        if transfer_layer not in usable_layers:
+            raise ValueError(
+                f"Requested transfer layer {transfer_layer} has no usable "
+                f"directions (usable: {usable_layers})."
+            )
+    else:
+        candidate_layers = [l for l in usable_layers if l >= 2] or usable_layers
+        transfer_layer = min(
+            candidate_layers, key=lambda l: disp["dispersion"][l]["mean_cos"]
+        )
     logger.info("Computing cross-domain transfer at layer %d...", transfer_layer)
     transfer_sims = compute_cross_domain_transfer(
         directions_dir, model_name, concept, domains, transfer_layer,
@@ -364,6 +423,23 @@ def run_pipeline(
     min_cos_layer = min(mean_cos_by_layer, key=mean_cos_by_layer.get)
     max_angle_layer = max(mean_angle_by_layer, key=mean_angle_by_layer.get)
 
+    # Early-layer minima can reflect token/surface statistics rather than
+    # concept representations; the late-layer aggregate (final third of the
+    # stack, where behavior is read out) is reported alongside the global
+    # minimum so the two can be contrasted.
+    late_layers = usable_layers[-max(1, len(usable_layers) // 3):]
+    late_mean_cos = float(np.mean([mean_cos_by_layer[l] for l in late_layers]))
+
+    # Extraction provenance sidecars (written by extract_activations), if any.
+    model_short = model_name.replace("-", "_").replace(".", "")
+    provenance = []
+    for meta_path in sorted(Path(activations_dir).glob(f"meta_{model_short}_{concept}_*.json")):
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                provenance.append(json.load(f))
+        except (OSError, json.JSONDecodeError) as e:
+            logger.warning("Could not read provenance sidecar %s: %s", meta_path, e)
+
     report = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "model": model_name,
@@ -373,6 +449,8 @@ def run_pipeline(
         "mock": mock,
         "seed": seed,
         "n_bootstrap": n_bootstrap,
+        "balance_domains": balance_domains,
+        "provenance": provenance,
         "dispersion": {l: disp["dispersion"][l] for l in usable_layers},
         "domain_vs_global": {
             l: disp["domain_vs_global"][l] for l in usable_layers
@@ -387,6 +465,8 @@ def run_pipeline(
             "min_mean_cos_layer": int(min_cos_layer),
             "max_mean_angle_deg": float(mean_angle_by_layer[max_angle_layer]),
             "max_mean_angle_layer": int(max_angle_layer),
+            "late_layer_mean_cos": late_mean_cos,
+            "late_layers": [int(l) for l in late_layers],
         },
         "figures": [],
     }
@@ -432,6 +512,12 @@ def main():
     parser.add_argument("--no-figures", action="store_true",
                         help="Skip figure generation (numbers + report only).")
     parser.add_argument("--n-bootstrap", type=int, default=1000)
+    parser.add_argument("--transfer-layer", type=int, default=None,
+                        help="Layer for the cross-domain transfer matrix "
+                             "(default: most-fragmented layer, excluding layers 0-1).")
+    parser.add_argument("--balance-domains", action="store_true",
+                        help="Subsample every domain to the smallest domain's pair "
+                             "count before computing directions (T4 sensitivity).")
     parser.add_argument("--n-pairs", type=int, default=40, help="(mock) pairs per domain.")
     parser.add_argument("--d-model", type=int, default=256, help="(mock) hidden size.")
     parser.add_argument("--seed", type=int, default=42)
@@ -476,6 +562,8 @@ def main():
         n_bootstrap=args.n_bootstrap,
         seed=args.seed,
         mock_kwargs={"n_pairs": args.n_pairs, "d_model": args.d_model},
+        transfer_layer=args.transfer_layer,
+        balance_domains=args.balance_domains,
     )
 
 
