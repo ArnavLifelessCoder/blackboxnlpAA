@@ -239,7 +239,7 @@ def compute_refusal_rate(
 
     n = len(results)
     if n == 0:
-        return {"original_refusal_rate": 0.0, "steered_refusal_rate": 0.0}
+       return {"original_refusal_rate": 0.0, "steered_refusal_rate": 0.0, "refusal_rate_delta": 0.0, "n_prompts": 0}
 
     original_refusals = sum(1 for r in results if is_refusal(r.original_output))
     steered_refusals = sum(1 for r in results if is_refusal(r.steered_output))
