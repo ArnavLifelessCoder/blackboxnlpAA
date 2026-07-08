@@ -1,0 +1,1044 @@
+{
+  "generated_at": "2026-07-08T18:54:46",
+  "model": "qwen-2.5-3b-instruct",
+  "concept": "honesty",
+  "domains": [
+    "factual_trivia",
+    "math",
+    "politics_opinion",
+    "personal_advice"
+  ],
+  "layers": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35
+  ],
+  "mock": false,
+  "seed": 42,
+  "n_bootstrap": 1000,
+  "balance_domains": false,
+  "provenance": [],
+  "dispersion": {
+    "0": {
+      "mean_cos": 0.5416560396552086,
+      "std_cos": 0.2532556234768015,
+      "min_cos": 0.15488898754119873,
+      "max_cos": 0.7883034348487854,
+      "mean_angle_deg": 55.57247123331993,
+      "std_angle_deg": 17.235019161910454,
+      "max_angle_deg": 81.08964204657902
+    },
+    "1": {
+      "mean_cos": 0.5353517923504114,
+      "std_cos": 0.26587235458214353,
+      "min_cos": 0.1221223846077919,
+      "max_cos": 0.796077311038971,
+      "mean_angle_deg": 55.90604363849488,
+      "std_angle_deg": 17.96664194679291,
+      "max_angle_deg": 82.9853926993599
+    },
+    "2": {
+      "mean_cos": 0.5293322000652552,
+      "std_cos": 0.27594059246723696,
+      "min_cos": 0.09897489100694656,
+      "max_cos": 0.798293948173523,
+      "mean_angle_deg": 56.230839561772626,
+      "std_angle_deg": 18.571379113982424,
+      "max_angle_deg": 84.31985678929757
+    },
+    "3": {
+      "mean_cos": 0.5296875424683094,
+      "std_cos": 0.2709430118429618,
+      "min_cos": 0.10247175395488739,
+      "max_cos": 0.7966134548187256,
+      "mean_angle_deg": 56.29378724589352,
+      "std_angle_deg": 18.175230821633015,
+      "max_angle_deg": 84.11847707293808
+    },
+    "4": {
+      "mean_cos": 0.5257263239473104,
+      "std_cos": 0.27399527017705577,
+      "min_cos": 0.09283708781003952,
+      "max_cos": 0.8029834032058716,
+      "mean_angle_deg": 56.542457743976975,
+      "std_angle_deg": 18.36276452204612,
+      "max_angle_deg": 84.67315615063671
+    },
+    "5": {
+      "mean_cos": 0.5216205660253763,
+      "std_cos": 0.25781225821029014,
+      "min_cos": 0.12128553539514542,
+      "max_cos": 0.7877233028411865,
+      "mean_angle_deg": 57.0195998937677,
+      "std_angle_deg": 17.276671969747,
+      "max_angle_deg": 83.03369972176495
+    },
+    "6": {
+      "mean_cos": 0.5258999355137348,
+      "std_cos": 0.24331012339189936,
+      "min_cos": 0.15323813259601593,
+      "max_cos": 0.7770383954048157,
+      "mean_angle_deg": 56.86457180463437,
+      "std_angle_deg": 16.36509312525855,
+      "max_angle_deg": 81.18537200513178
+    },
+    "7": {
+      "mean_cos": 0.5398074276745319,
+      "std_cos": 0.23837685222073346,
+      "min_cos": 0.17944689095020294,
+      "max_cos": 0.7817243337631226,
+      "mean_angle_deg": 55.88403565772178,
+      "std_angle_deg": 16.224141599077008,
+      "max_angle_deg": 79.66245556636254
+    },
+    "8": {
+      "mean_cos": 0.5339789353311062,
+      "std_cos": 0.24035257442053887,
+      "min_cos": 0.16543181240558624,
+      "max_cos": 0.772238552570343,
+      "mean_angle_deg": 56.31732140509909,
+      "std_angle_deg": 16.216778032358487,
+      "max_angle_deg": 80.47767975973632
+    },
+    "9": {
+      "mean_cos": 0.5365385226905346,
+      "std_cos": 0.2581725545690154,
+      "min_cos": 0.14089177548885345,
+      "max_cos": 0.796687126159668,
+      "mean_angle_deg": 55.886799737550106,
+      "std_angle_deg": 17.530609591787996,
+      "max_angle_deg": 81.90054727402611
+    },
+    "10": {
+      "mean_cos": 0.5421751774847507,
+      "std_cos": 0.258692467938458,
+      "min_cos": 0.14326585829257965,
+      "max_cos": 0.8057963848114014,
+      "mean_angle_deg": 55.458504605274456,
+      "std_angle_deg": 17.635649084302468,
+      "max_angle_deg": 81.76312824631371
+    },
+    "11": {
+      "mean_cos": 0.5529307834804058,
+      "std_cos": 0.25006505316745137,
+      "min_cos": 0.1625620573759079,
+      "max_cos": 0.8146688342094421,
+      "mean_angle_deg": 54.76940741118982,
+      "std_angle_deg": 17.15672260426007,
+      "max_angle_deg": 80.64436140199211
+    },
+    "12": {
+      "mean_cos": 0.5500816404819489,
+      "std_cos": 0.26094548744313595,
+      "min_cos": 0.13973468542099,
+      "max_cos": 0.8183090686798096,
+      "mean_angle_deg": 54.85456095249634,
+      "std_angle_deg": 17.83468608400609,
+      "max_angle_deg": 81.96750606775724
+    },
+    "13": {
+      "mean_cos": 0.5533675029873848,
+      "std_cos": 0.26359031091174295,
+      "min_cos": 0.13183578848838806,
+      "max_cos": 0.8224645256996155,
+      "mean_angle_deg": 54.60412090341218,
+      "std_angle_deg": 17.970836462030707,
+      "max_angle_deg": 82.42431158893474
+    },
+    "14": {
+      "mean_cos": 0.549751527607441,
+      "std_cos": 0.28135131168973687,
+      "min_cos": 0.10293486714363098,
+      "max_cos": 0.8275073170661926,
+      "mean_angle_deg": 54.618501963082416,
+      "std_angle_deg": 19.179904627500214,
+      "max_angle_deg": 84.09180158244432
+    },
+    "15": {
+      "mean_cos": 0.5642195288091898,
+      "std_cos": 0.28421278481974394,
+      "min_cos": 0.1013367548584938,
+      "max_cos": 0.8380714058876038,
+      "mean_angle_deg": 53.52845551629282,
+      "std_angle_deg": 19.395259319282466,
+      "max_angle_deg": 84.18384804199967
+    },
+    "16": {
+      "mean_cos": 0.5734348818659782,
+      "std_cos": 0.2924389322523131,
+      "min_cos": 0.08720061182975769,
+      "max_cos": 0.8399059772491455,
+      "mean_angle_deg": 52.78059198347434,
+      "std_angle_deg": 19.846643251021586,
+      "max_angle_deg": 84.99741936580679
+    },
+    "17": {
+      "mean_cos": 0.5840414352715015,
+      "std_cos": 0.2962261852424904,
+      "min_cos": 0.08768565952777863,
+      "max_cos": 0.8490766882896423,
+      "mean_angle_deg": 51.906544868838836,
+      "std_angle_deg": 20.17757594340626,
+      "max_angle_deg": 84.96952131644285
+    },
+    "18": {
+      "mean_cos": 0.5915311593562365,
+      "std_cos": 0.3053785821507168,
+      "min_cos": 0.07765353471040726,
+      "max_cos": 0.8534007668495178,
+      "mean_angle_deg": 51.18136978007395,
+      "std_angle_deg": 20.840351969992692,
+      "max_angle_deg": 85.54629650059248
+    },
+    "19": {
+      "mean_cos": 0.6146795228123665,
+      "std_cos": 0.28162493885979073,
+      "min_cos": 0.13833817839622498,
+      "max_cos": 0.8491921424865723,
+      "mean_angle_deg": 49.6972264000244,
+      "std_angle_deg": 19.454577718893383,
+      "max_angle_deg": 82.04830480999254
+    },
+    "20": {
+      "mean_cos": 0.6409524045884609,
+      "std_cos": 0.2765992235561929,
+      "min_cos": 0.17124800384044647,
+      "max_cos": 0.8677444458007812,
+      "mean_angle_deg": 47.55574306108644,
+      "std_angle_deg": 19.507830494179455,
+      "max_angle_deg": 80.13961144138551
+    },
+    "21": {
+      "mean_cos": 0.6350013017654419,
+      "std_cos": 0.27623131468331813,
+      "min_cos": 0.16695404052734375,
+      "max_cos": 0.8620544672012329,
+      "mean_angle_deg": 48.067241380983006,
+      "std_angle_deg": 19.404273853468176,
+      "max_angle_deg": 80.38923249004309
+    },
+    "22": {
+      "mean_cos": 0.6338502801954746,
+      "std_cos": 0.27777197395640785,
+      "min_cos": 0.16244091093540192,
+      "max_cos": 0.8571333289146423,
+      "mean_angle_deg": 48.158893665895526,
+      "std_angle_deg": 19.446454043802206,
+      "max_angle_deg": 80.65139608463802
+    },
+    "23": {
+      "mean_cos": 0.6553363092243671,
+      "std_cos": 0.2450350047912323,
+      "min_cos": 0.23911429941654205,
+      "max_cos": 0.8455607891082764,
+      "mean_angle_deg": 46.89505269090629,
+      "std_angle_deg": 17.465211320706697,
+      "max_angle_deg": 76.16572849557093
+    },
+    "24": {
+      "mean_cos": 0.6727546229958534,
+      "std_cos": 0.2622600756830175,
+      "min_cos": 0.22350355982780457,
+      "max_cos": 0.859864354133606,
+      "mean_angle_deg": 45.08823553800256,
+      "std_angle_deg": 18.859580111341007,
+      "max_angle_deg": 77.08510230639973
+    },
+    "25": {
+      "mean_cos": 0.6859476156532764,
+      "std_cos": 0.2727459769795143,
+      "min_cos": 0.21609802544116974,
+      "max_cos": 0.8693851232528687,
+      "mean_angle_deg": 43.70369858096989,
+      "std_angle_deg": 19.743980446762823,
+      "max_angle_deg": 77.52004599062744
+    },
+    "26": {
+      "mean_cos": 0.6926080249249935,
+      "std_cos": 0.2723371524143942,
+      "min_cos": 0.2232135385274887,
+      "max_cos": 0.8770627975463867,
+      "mean_angle_deg": 43.078614350882674,
+      "std_angle_deg": 19.849533244488242,
+      "max_angle_deg": 77.10214998959235
+    },
+    "27": {
+      "mean_cos": 0.6943221651017666,
+      "std_cos": 0.27974596603682955,
+      "min_cos": 0.21147631108760834,
+      "max_cos": 0.8754853010177612,
+      "mean_angle_deg": 42.7647387250741,
+      "std_angle_deg": 20.378444031403635,
+      "max_angle_deg": 77.79111811611847
+    },
+    "28": {
+      "mean_cos": 0.6842309013009071,
+      "std_cos": 0.2803669711727409,
+      "min_cos": 0.2006007730960846,
+      "max_cos": 0.8692756295204163,
+      "mean_angle_deg": 43.72110761491394,
+      "std_angle_deg": 20.212286242414706,
+      "max_angle_deg": 78.42790720155901
+    },
+    "29": {
+      "mean_cos": 0.6908802017569542,
+      "std_cos": 0.26327310340388893,
+      "min_cos": 0.23708894848823547,
+      "max_cos": 0.8632876873016357,
+      "mean_angle_deg": 43.44832955954115,
+      "std_angle_deg": 19.14724649577421,
+      "max_angle_deg": 76.28520880484024
+    },
+    "30": {
+      "mean_cos": 0.6887803710997105,
+      "std_cos": 0.26621942978946606,
+      "min_cos": 0.22912152111530304,
+      "max_cos": 0.8625015616416931,
+      "mean_angle_deg": 43.60942625851177,
+      "std_angle_deg": 19.261786149604895,
+      "max_angle_deg": 76.75464244942167
+    },
+    "31": {
+      "mean_cos": 0.6815876364707947,
+      "std_cos": 0.2634347669535788,
+      "min_cos": 0.22648721933364868,
+      "max_cos": 0.852056086063385,
+      "mean_angle_deg": 44.350089006038296,
+      "std_angle_deg": 18.897201429096526,
+      "max_angle_deg": 76.9096525703474
+    },
+    "32": {
+      "mean_cos": 0.6827475316822529,
+      "std_cos": 0.2553938636419363,
+      "min_cos": 0.24183620512485504,
+      "max_cos": 0.851649820804596,
+      "mean_angle_deg": 44.392863995684365,
+      "std_angle_deg": 18.369795967923377,
+      "max_angle_deg": 76.00505995066479
+    },
+    "33": {
+      "mean_cos": 0.6869167536497116,
+      "std_cos": 0.2708761336247107,
+      "min_cos": 0.21891075372695923,
+      "max_cos": 0.8619662523269653,
+      "mean_angle_deg": 43.697260444239866,
+      "std_angle_deg": 19.534503343384696,
+      "max_angle_deg": 77.35493561597204
+    },
+    "34": {
+      "mean_cos": 0.6980393677949905,
+      "std_cos": 0.24562054244878267,
+      "min_cos": 0.27405786514282227,
+      "max_cos": 0.8620126247406006,
+      "mean_angle_deg": 43.15920925885614,
+      "std_angle_deg": 17.983539683422357,
+      "max_angle_deg": 74.09412304764496
+    },
+    "35": {
+      "mean_cos": 0.769130602478981,
+      "std_cos": 0.1544871569074645,
+      "min_cos": 0.5022526383399963,
+      "max_cos": 0.8756833076477051,
+      "mean_angle_deg": 38.112309835787094,
+      "std_angle_deg": 12.614069192952362,
+      "max_angle_deg": 59.8508544039873
+    }
+  },
+  "domain_vs_global": {
+    "0": {
+      "factual_trivia": 0.7883034348487854,
+      "math": 0.15488898754119873,
+      "politics_opinion": 0.476969450712204,
+      "personal_advice": 0.7464622855186462
+    },
+    "1": {
+      "factual_trivia": 0.796077311038971,
+      "math": 0.1221223846077919,
+      "politics_opinion": 0.4843493103981018,
+      "personal_advice": 0.738858163356781
+    },
+    "2": {
+      "factual_trivia": 0.798293948173523,
+      "math": 0.09897489100694656,
+      "politics_opinion": 0.4796445071697235,
+      "personal_advice": 0.7404154539108276
+    },
+    "3": {
+      "factual_trivia": 0.7966134548187256,
+      "math": 0.10247175395488739,
+      "politics_opinion": 0.49357572197914124,
+      "personal_advice": 0.7260892391204834
+    },
+    "4": {
+      "factual_trivia": 0.8029834032058716,
+      "math": 0.09283708781003952,
+      "politics_opinion": 0.49418434500694275,
+      "personal_advice": 0.7129004597663879
+    },
+    "5": {
+      "factual_trivia": 0.7877233028411865,
+      "math": 0.12128553539514542,
+      "politics_opinion": 0.4752010703086853,
+      "personal_advice": 0.702272355556488
+    },
+    "6": {
+      "factual_trivia": 0.7770383954048157,
+      "math": 0.15323813259601593,
+      "politics_opinion": 0.4694695472717285,
+      "personal_advice": 0.7038536667823792
+    },
+    "7": {
+      "factual_trivia": 0.7817243337631226,
+      "math": 0.17944689095020294,
+      "politics_opinion": 0.47274357080459595,
+      "personal_advice": 0.7253149151802063
+    },
+    "8": {
+      "factual_trivia": 0.772238552570343,
+      "math": 0.16543181240558624,
+      "politics_opinion": 0.47665759921073914,
+      "personal_advice": 0.7215877771377563
+    },
+    "9": {
+      "factual_trivia": 0.796687126159668,
+      "math": 0.14089177548885345,
+      "politics_opinion": 0.47541022300720215,
+      "personal_advice": 0.7331649661064148
+    },
+    "10": {
+      "factual_trivia": 0.8057963848114014,
+      "math": 0.14326585829257965,
+      "politics_opinion": 0.48752665519714355,
+      "personal_advice": 0.7321118116378784
+    },
+    "11": {
+      "factual_trivia": 0.8146688342094421,
+      "math": 0.1625620573759079,
+      "politics_opinion": 0.5148677825927734,
+      "personal_advice": 0.7196244597434998
+    },
+    "12": {
+      "factual_trivia": 0.8183090686798096,
+      "math": 0.13973468542099,
+      "politics_opinion": 0.5164021253585815,
+      "personal_advice": 0.7258806824684143
+    },
+    "13": {
+      "factual_trivia": 0.8224645256996155,
+      "math": 0.13183578848838806,
+      "politics_opinion": 0.5395874977111816,
+      "personal_advice": 0.719582200050354
+    },
+    "14": {
+      "factual_trivia": 0.8275073170661926,
+      "math": 0.10293486714363098,
+      "politics_opinion": 0.5212553143501282,
+      "personal_advice": 0.747308611869812
+    },
+    "15": {
+      "factual_trivia": 0.8380714058876038,
+      "math": 0.1013367548584938,
+      "politics_opinion": 0.5693314671516418,
+      "personal_advice": 0.7481384873390198
+    },
+    "16": {
+      "factual_trivia": 0.8399059772491455,
+      "math": 0.08720061182975769,
+      "politics_opinion": 0.6108472347259521,
+      "personal_advice": 0.7557857036590576
+    },
+    "17": {
+      "factual_trivia": 0.8490766882896423,
+      "math": 0.08768565952777863,
+      "politics_opinion": 0.6379259824752808,
+      "personal_advice": 0.7614774107933044
+    },
+    "18": {
+      "factual_trivia": 0.8534007668495178,
+      "math": 0.07765353471040726,
+      "politics_opinion": 0.6518678665161133,
+      "personal_advice": 0.7832024693489075
+    },
+    "19": {
+      "factual_trivia": 0.8491921424865723,
+      "math": 0.13833817839622498,
+      "politics_opinion": 0.6803100109100342,
+      "personal_advice": 0.7908777594566345
+    },
+    "20": {
+      "factual_trivia": 0.8677444458007812,
+      "math": 0.17124800384044647,
+      "politics_opinion": 0.7151409387588501,
+      "personal_advice": 0.8096762299537659
+    },
+    "21": {
+      "factual_trivia": 0.8620544672012329,
+      "math": 0.16695404052734375,
+      "politics_opinion": 0.7027987241744995,
+      "personal_advice": 0.8081979751586914
+    },
+    "22": {
+      "factual_trivia": 0.8571333289146423,
+      "math": 0.16244091093540192,
+      "politics_opinion": 0.7042309045791626,
+      "personal_advice": 0.8115959763526917
+    },
+    "23": {
+      "factual_trivia": 0.8455607891082764,
+      "math": 0.23911429941654205,
+      "politics_opinion": 0.7173200845718384,
+      "personal_advice": 0.8193500638008118
+    },
+    "24": {
+      "factual_trivia": 0.859864354133606,
+      "math": 0.22350355982780457,
+      "politics_opinion": 0.7595207691192627,
+      "personal_advice": 0.8481298089027405
+    },
+    "25": {
+      "factual_trivia": 0.8618459701538086,
+      "math": 0.21609802544116974,
+      "politics_opinion": 0.7964613437652588,
+      "personal_advice": 0.8693851232528687
+    },
+    "26": {
+      "factual_trivia": 0.8770627975463867,
+      "math": 0.2232135385274887,
+      "politics_opinion": 0.8057518601417542,
+      "personal_advice": 0.8644039034843445
+    },
+    "27": {
+      "factual_trivia": 0.8754853010177612,
+      "math": 0.21147631108760834,
+      "politics_opinion": 0.8171921968460083,
+      "personal_advice": 0.8731348514556885
+    },
+    "28": {
+      "factual_trivia": 0.8692756295204163,
+      "math": 0.2006007730960846,
+      "politics_opinion": 0.8043150305747986,
+      "personal_advice": 0.8627321720123291
+    },
+    "29": {
+      "factual_trivia": 0.8632868528366089,
+      "math": 0.23708894848823547,
+      "politics_opinion": 0.7998573184013367,
+      "personal_advice": 0.8632876873016357
+    },
+    "30": {
+      "factual_trivia": 0.8625015616416931,
+      "math": 0.22912152111530304,
+      "politics_opinion": 0.8078153729438782,
+      "personal_advice": 0.8556830286979675
+    },
+    "31": {
+      "factual_trivia": 0.852056086063385,
+      "math": 0.22648721933364868,
+      "politics_opinion": 0.8025969862937927,
+      "personal_advice": 0.8452102541923523
+    },
+    "32": {
+      "factual_trivia": 0.851649820804596,
+      "math": 0.24183620512485504,
+      "politics_opinion": 0.7966289520263672,
+      "personal_advice": 0.8408751487731934
+    },
+    "33": {
+      "factual_trivia": 0.8547470569610596,
+      "math": 0.21891075372695923,
+      "politics_opinion": 0.8120429515838623,
+      "personal_advice": 0.8619662523269653
+    },
+    "34": {
+      "factual_trivia": 0.8488775491714478,
+      "math": 0.27405786514282227,
+      "politics_opinion": 0.8072094321250916,
+      "personal_advice": 0.8620126247406006
+    },
+    "35": {
+      "factual_trivia": 0.8535184860229492,
+      "math": 0.5022526383399963,
+      "politics_opinion": 0.8450679779052734,
+      "personal_advice": 0.8756833076477051
+    }
+  },
+  "bootstrap": {
+    "0": {
+      "point_estimate": 0.5416560495026037,
+      "ci_lower": 0.4809154097635447,
+      "ci_upper": 0.5523573545880146,
+      "se": 0.0177476028409643,
+      "n_bootstrap": 1000,
+      "angle_std_point": 17.235020927511105,
+      "angle_std_ci_lower": 12.900157456313408,
+      "angle_std_ci_upper": 18.715875783184742,
+      "method": "pair-level"
+    },
+    "1": {
+      "point_estimate": 0.5353517871988822,
+      "ci_lower": 0.4772797935215791,
+      "ci_upper": 0.5467945996787226,
+      "se": 0.01731461519161342,
+      "n_bootstrap": 1000,
+      "angle_std_point": 17.96664066087057,
+      "angle_std_ci_lower": 13.341542117090029,
+      "angle_std_ci_upper": 19.24807076814956,
+      "method": "pair-level"
+    },
+    "2": {
+      "point_estimate": 0.5293321595055053,
+      "ci_lower": 0.47381975275660765,
+      "ci_upper": 0.5402262728400947,
+      "se": 0.016840218489133685,
+      "n_bootstrap": 1000,
+      "angle_std_point": 18.571377047007037,
+      "angle_std_ci_lower": 13.74806319084455,
+      "angle_std_ci_upper": 19.770428013636984,
+      "method": "pair-level"
+    },
+    "3": {
+      "point_estimate": 0.5296874827628923,
+      "ci_lower": 0.4748321276556018,
+      "ci_upper": 0.5403622797911752,
+      "se": 0.01647515411705321,
+      "n_bootstrap": 1000,
+      "angle_std_point": 18.175226924890026,
+      "angle_std_ci_lower": 13.583672929554993,
+      "angle_std_ci_upper": 19.320435793055168,
+      "method": "pair-level"
+    },
+    "4": {
+      "point_estimate": 0.5257262875808317,
+      "ci_lower": 0.47456276123239693,
+      "ci_upper": 0.5386184794037131,
+      "se": 0.01626952845390985,
+      "n_bootstrap": 1000,
+      "angle_std_point": 18.362763961341876,
+      "angle_std_ci_lower": 13.911133684787504,
+      "angle_std_ci_upper": 19.5246348964993,
+      "method": "pair-level"
+    },
+    "5": {
+      "point_estimate": 0.5216205623437935,
+      "ci_lower": 0.4737592848441824,
+      "ci_upper": 0.533396328112005,
+      "se": 0.015488917710250977,
+      "n_bootstrap": 1000,
+      "angle_std_point": 17.276672001724123,
+      "angle_std_ci_lower": 12.945185604532394,
+      "angle_std_ci_upper": 18.598542875747707,
+      "method": "pair-level"
+    },
+    "6": {
+      "point_estimate": 0.5258998707254726,
+      "ci_lower": 0.4772703990649732,
+      "ci_upper": 0.5377191522440635,
+      "se": 0.01516940401344217,
+      "n_bootstrap": 1000,
+      "angle_std_point": 16.365090755281113,
+      "angle_std_ci_lower": 12.119419199313116,
+      "angle_std_ci_upper": 17.840055168513114,
+      "method": "pair-level"
+    },
+    "7": {
+      "point_estimate": 0.539807379550233,
+      "ci_lower": 0.4900704203805096,
+      "ci_upper": 0.5485068973055565,
+      "se": 0.01477745080681004,
+      "n_bootstrap": 1000,
+      "angle_std_point": 16.22413994775046,
+      "angle_std_ci_lower": 11.873334659939472,
+      "angle_std_ci_upper": 17.563263478653546,
+      "method": "pair-level"
+    },
+    "8": {
+      "point_estimate": 0.5339789049290345,
+      "ci_lower": 0.48582171083809983,
+      "ci_upper": 0.5438004850666045,
+      "se": 0.014901782606873502,
+      "n_bootstrap": 1000,
+      "angle_std_point": 16.21677550684721,
+      "angle_std_ci_lower": 11.825825263681145,
+      "angle_std_ci_upper": 17.706123424531675,
+      "method": "pair-level"
+    },
+    "9": {
+      "point_estimate": 0.5365384946179658,
+      "ci_lower": 0.4861032375106254,
+      "ci_upper": 0.5465171607068892,
+      "se": 0.01566372726430713,
+      "n_bootstrap": 1000,
+      "angle_std_point": 17.530604945055064,
+      "angle_std_ci_lower": 12.847086102895222,
+      "angle_std_ci_upper": 19.20681136670628,
+      "method": "pair-level"
+    },
+    "10": {
+      "point_estimate": 0.5421751465049404,
+      "ci_lower": 0.4880289030541387,
+      "ci_upper": 0.5522212751495609,
+      "se": 0.016351778326137167,
+      "n_bootstrap": 1000,
+      "angle_std_point": 17.63564627479926,
+      "angle_std_ci_lower": 13.023166048585937,
+      "angle_std_ci_upper": 19.289129601804806,
+      "method": "pair-level"
+    },
+    "11": {
+      "point_estimate": 0.5529307926041245,
+      "ci_lower": 0.4970804547119001,
+      "ci_upper": 0.5620176537926318,
+      "se": 0.01650443194795796,
+      "n_bootstrap": 1000,
+      "angle_std_point": 17.156726473958,
+      "angle_std_ci_lower": 12.690973993860267,
+      "angle_std_ci_upper": 18.949579655022077,
+      "method": "pair-level"
+    },
+    "12": {
+      "point_estimate": 0.5500816027551166,
+      "ci_lower": 0.49575092236297,
+      "ci_upper": 0.5592719171098469,
+      "se": 0.0161092654312821,
+      "n_bootstrap": 1000,
+      "angle_std_point": 17.834681972950452,
+      "angle_std_ci_lower": 13.41387837430298,
+      "angle_std_ci_upper": 19.39355371825166,
+      "method": "pair-level"
+    },
+    "13": {
+      "point_estimate": 0.5533674629087079,
+      "ci_lower": 0.49546779133917046,
+      "ci_upper": 0.5639208380494715,
+      "se": 0.017403628532857367,
+      "n_bootstrap": 1000,
+      "angle_std_point": 17.97083170091957,
+      "angle_std_ci_lower": 13.268832460017968,
+      "angle_std_ci_upper": 19.5847987337969,
+      "method": "pair-level"
+    },
+    "14": {
+      "point_estimate": 0.5497515551728003,
+      "ci_lower": 0.494171944227565,
+      "ci_upper": 0.561828443339746,
+      "se": 0.01750953399908688,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.17990404585634,
+      "angle_std_ci_lower": 14.29890560024163,
+      "angle_std_ci_upper": 20.763687804903746,
+      "method": "pair-level"
+    },
+    "15": {
+      "point_estimate": 0.5642194588301515,
+      "ci_lower": 0.5049971198645469,
+      "ci_upper": 0.5736472218511207,
+      "se": 0.01755408545706263,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.39525385781205,
+      "angle_std_ci_lower": 14.764628070471082,
+      "angle_std_ci_upper": 20.834980675332222,
+      "method": "pair-level"
+    },
+    "16": {
+      "point_estimate": 0.573434843537309,
+      "ci_lower": 0.5153908899898784,
+      "ci_upper": 0.5817416207278524,
+      "se": 0.017265858315973718,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.846639867041727,
+      "angle_std_ci_lower": 15.196235963708284,
+      "angle_std_ci_upper": 20.93691989940901,
+      "method": "pair-level"
+    },
+    "17": {
+      "point_estimate": 0.584041357423212,
+      "ci_lower": 0.524089932037919,
+      "ci_upper": 0.5913512180756794,
+      "se": 0.017096185777025038,
+      "n_bootstrap": 1000,
+      "angle_std_point": 20.17757100874056,
+      "angle_std_ci_lower": 15.433582466810565,
+      "angle_std_ci_upper": 21.211824939158948,
+      "method": "pair-level"
+    },
+    "18": {
+      "point_estimate": 0.5915311239868358,
+      "ci_lower": 0.534722917692749,
+      "ci_upper": 0.5974695469029114,
+      "se": 0.016475007723535762,
+      "n_bootstrap": 1000,
+      "angle_std_point": 20.840349153069393,
+      "angle_std_ci_lower": 16.0722568794913,
+      "angle_std_ci_upper": 21.560288896911825,
+      "method": "pair-level"
+    },
+    "19": {
+      "point_estimate": 0.6146794809372568,
+      "ci_lower": 0.5579729671550376,
+      "ci_upper": 0.6162812828050488,
+      "se": 0.014696347942034243,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.454575200375295,
+      "angle_std_ci_lower": 15.240871878641526,
+      "angle_std_ci_upper": 20.189800988654333,
+      "method": "pair-level"
+    },
+    "20": {
+      "point_estimate": 0.6409523350777757,
+      "ci_lower": 0.5791148314228787,
+      "ci_upper": 0.6420664386157151,
+      "se": 0.01562786940143649,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.507829614383816,
+      "angle_std_ci_lower": 15.20609974264986,
+      "angle_std_ci_upper": 20.505436610045408,
+      "method": "pair-level"
+    },
+    "21": {
+      "point_estimate": 0.6350012653776209,
+      "ci_lower": 0.5751131727914396,
+      "ci_upper": 0.6364408053854597,
+      "se": 0.015859298084714625,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.40426985459724,
+      "angle_std_ci_lower": 14.999585007152978,
+      "angle_std_ci_upper": 20.561502396967807,
+      "method": "pair-level"
+    },
+    "22": {
+      "point_estimate": 0.6338502804800492,
+      "ci_lower": 0.5757597611304751,
+      "ci_upper": 0.6363793948301257,
+      "se": 0.01576103993769188,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.446452499138825,
+      "angle_std_ci_lower": 14.797038817770888,
+      "angle_std_ci_upper": 20.62422888128659,
+      "method": "pair-level"
+    },
+    "23": {
+      "point_estimate": 0.6553362551798676,
+      "ci_lower": 0.5984344252575092,
+      "ci_upper": 0.6511379299562827,
+      "se": 0.013687103831141832,
+      "n_bootstrap": 1000,
+      "angle_std_point": 17.465210990863202,
+      "angle_std_ci_lower": 13.686297420152096,
+      "angle_std_ci_upper": 18.4625765183744,
+      "method": "pair-level"
+    },
+    "24": {
+      "point_estimate": 0.6727545667542499,
+      "ci_lower": 0.6171344994756014,
+      "ci_upper": 0.6699868666928614,
+      "se": 0.013740454302267066,
+      "n_bootstrap": 1000,
+      "angle_std_point": 18.85957935150915,
+      "angle_std_ci_lower": 14.854513911210024,
+      "angle_std_ci_upper": 19.834400865891745,
+      "method": "pair-level"
+    },
+    "25": {
+      "point_estimate": 0.6859475436697808,
+      "ci_lower": 0.6292986303990133,
+      "ci_upper": 0.685932680538972,
+      "se": 0.014573396652105523,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.74397893617579,
+      "angle_std_ci_lower": 15.382851404112143,
+      "angle_std_ci_upper": 20.86798540021462,
+      "method": "pair-level"
+    },
+    "26": {
+      "point_estimate": 0.6926079935192718,
+      "ci_lower": 0.6366065978431984,
+      "ci_upper": 0.6918870000328478,
+      "se": 0.013942300291327606,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.849533943241934,
+      "angle_std_ci_lower": 15.741545093048183,
+      "angle_std_ci_upper": 20.896178755265144,
+      "method": "pair-level"
+    },
+    "27": {
+      "point_estimate": 0.6943221484882782,
+      "ci_lower": 0.6383407820574746,
+      "ci_upper": 0.6952834328480387,
+      "se": 0.014377166427178404,
+      "n_bootstrap": 1000,
+      "angle_std_point": 20.37844244344718,
+      "angle_std_ci_lower": 16.12316072964318,
+      "angle_std_ci_upper": 21.42101085789162,
+      "method": "pair-level"
+    },
+    "28": {
+      "point_estimate": 0.6842308947950796,
+      "ci_lower": 0.6277308810414647,
+      "ci_upper": 0.6846739582628844,
+      "se": 0.014025047945688826,
+      "n_bootstrap": 1000,
+      "angle_std_point": 20.21228659073196,
+      "angle_std_ci_lower": 15.991421301357079,
+      "angle_std_ci_upper": 21.01635817810411,
+      "method": "pair-level"
+    },
+    "29": {
+      "point_estimate": 0.690880205202711,
+      "ci_lower": 0.6338340947412971,
+      "ci_upper": 0.6880362705927181,
+      "se": 0.013533175221936242,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.14724881234232,
+      "angle_std_ci_lower": 15.050374973290701,
+      "angle_std_ci_upper": 19.983135404811645,
+      "method": "pair-level"
+    },
+    "30": {
+      "point_estimate": 0.6887802853891853,
+      "ci_lower": 0.6327011180792106,
+      "ci_upper": 0.6874559502074108,
+      "se": 0.0140530738947383,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.261779927346517,
+      "angle_std_ci_lower": 15.063437514626402,
+      "angle_std_ci_upper": 20.3033206117406,
+      "method": "pair-level"
+    },
+    "31": {
+      "point_estimate": 0.6815876709689628,
+      "ci_lower": 0.6267492498603608,
+      "ci_upper": 0.6787361011454107,
+      "se": 0.01357639463796475,
+      "n_bootstrap": 1000,
+      "angle_std_point": 18.897200769489036,
+      "angle_std_ci_lower": 14.644011492363926,
+      "angle_std_ci_upper": 19.902742628292895,
+      "method": "pair-level"
+    },
+    "32": {
+      "point_estimate": 0.6827475141800071,
+      "ci_lower": 0.6268835655525301,
+      "ci_upper": 0.6779615538478577,
+      "se": 0.013390419972895242,
+      "n_bootstrap": 1000,
+      "angle_std_point": 18.369798000752365,
+      "angle_std_ci_lower": 14.1675869802671,
+      "angle_std_ci_upper": 19.40523254290955,
+      "method": "pair-level"
+    },
+    "33": {
+      "point_estimate": 0.6869167172999053,
+      "ci_lower": 0.6319565672335424,
+      "ci_upper": 0.6848798126989603,
+      "se": 0.013330375929184317,
+      "n_bootstrap": 1000,
+      "angle_std_point": 19.534501339878418,
+      "angle_std_ci_lower": 15.210281482339653,
+      "angle_std_ci_upper": 20.370719997500302,
+      "method": "pair-level"
+    },
+    "34": {
+      "point_estimate": 0.698039310381223,
+      "ci_lower": 0.639039811798166,
+      "ci_upper": 0.6946275375946546,
+      "se": 0.013702005031896643,
+      "n_bootstrap": 1000,
+      "angle_std_point": 17.983535506860168,
+      "angle_std_ci_lower": 13.814674055007384,
+      "angle_std_ci_upper": 18.9145586565731,
+      "method": "pair-level"
+    },
+    "35": {
+      "point_estimate": 0.7691305358154665,
+      "ci_lower": 0.6902094713881731,
+      "ci_upper": 0.7702834451219173,
+      "se": 0.02073357047503427,
+      "n_bootstrap": 1000,
+      "angle_std_point": 12.614063838298334,
+      "angle_std_ci_lower": 8.88202212971634,
+      "angle_std_ci_upper": 14.656098961789667,
+      "method": "pair-level"
+    }
+  },
+  "transfer": {
+    "layer": 5,
+    "pairwise": {
+      "factual_trivia->factual_trivia": 1.0,
+      "factual_trivia->math": -0.05480651557445526,
+      "math->factual_trivia": -0.05480651557445526,
+      "factual_trivia->personal_advice": 0.34301385283470154,
+      "personal_advice->factual_trivia": 0.34301385283470154,
+      "factual_trivia->politics_opinion": 0.13966800272464752,
+      "politics_opinion->factual_trivia": 0.13966800272464752,
+      "math->math": 0.9999999403953552,
+      "math->personal_advice": -0.026540586724877357,
+      "personal_advice->math": -0.026540586724877357,
+      "math->politics_opinion": -0.09923805296421051,
+      "politics_opinion->math": -0.09923805296421051,
+      "personal_advice->personal_advice": 1.0,
+      "personal_advice->politics_opinion": 0.07336030900478363,
+      "politics_opinion->personal_advice": 0.07336030900478363,
+      "politics_opinion->politics_opinion": 1.0
+    }
+  },
+  "summary": {
+    "min_mean_cos": 0.5216205660253763,
+    "min_mean_cos_layer": 5,
+    "max_mean_angle_deg": 57.0195998937677,
+    "max_mean_angle_layer": 5,
+    "late_layer_mean_cos": 0.6939954829091827,
+    "late_layers": [
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35
+    ]
+  },
+  "figures": [
+    "heatmap_honesty_qwen-2.5-3b-instruct",
+    "dispersion_profile_honesty_qwen-2.5-3b-instruct",
+    "transfer_matrix_honesty_qwen-2.5-3b-instruct_layer005",
+    "geometry_pca_honesty_qwen-2.5-3b-instruct"
+  ]
+}
