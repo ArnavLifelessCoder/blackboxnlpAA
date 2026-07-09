@@ -1,7 +1,10 @@
 # Latest Run Summary & Next Steps
 
-> Snapshot updated: 2026-07-07. Sources: `results/report_{honesty,refusal}_qwen-2.5-3b*.{md,json}`
-> (primary study runs) and `results/report_refusal_gemma-2-2b*.{md,json}` (pilot).
+> Snapshot updated: 2026-07-09. **Freshest numbers are in `results_final/`**
+> (Jul 8 rerun with the fixed pipeline: pair-level CIs, corrected transfer
+> layers, late-layer stats). Session outcome table: `docs/whats_left.md`.
+> ⚠️ The Jul 8 E4 steering JSON in `results_final/` is INVALID (n=0 — see
+> `docs/whats_left.md`); the driver is fixed, rerun on next GPU session.
 > Companion to `next_steps.md`, `docs/remaining_work.md`, `docs/experimental_design.md`.
 
 ## What has run

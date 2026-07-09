@@ -236,3 +236,14 @@ class TestSteeringHeldout:
             tmp_path, "refusal", ["privacy"], n_heldout=5, skip_first=20
         )
         assert len(prompts["privacy"]) == 5  # last 5, with a warning
+
+    def test_missing_data_raises_instead_of_empty_run(self, tmp_path):
+        # Regression: the Jul 8 Kaggle E4 run silently generated on ZERO
+        # prompts because the gitignored prompt-based dir was absent.
+        from src.analysis.run_steering import heldout_prompts_by_domain
+
+        with pytest.raises(RuntimeError, match="build_refusal_promptbased"):
+            heldout_prompts_by_domain(
+                tmp_path / "nonexistent_or_empty", "refusal", ["violence"],
+                n_heldout=5, skip_first=20,
+            )

@@ -93,6 +93,15 @@ def heldout_prompts_by_domain(
                 concept, domain, len(spare), skip_first, n_heldout, n_heldout,
             )
             chosen = pairs[-n_heldout:]
+        if not chosen:
+            # data/prompt_pairs_promptbased/ is gitignored, so a fresh clone
+            # (e.g. Kaggle) does not have it — running anyway would silently
+            # produce an all-zero, n=0 "result".
+            raise RuntimeError(
+                f"No held-out prompts for {concept}/{domain} under {data_dir}. "
+                "If this is a fresh checkout, rebuild the prompt-based set first: "
+                "python scripts/build_refusal_promptbased.py --max-per-domain 120"
+            )
         prompts[domain] = [pair_to_contrastive_texts(p)[1] for p in chosen]
     return prompts
 
@@ -136,6 +145,27 @@ def run_steering_experiment(
     # required regardless of which backend produced the activations.
     from src.extraction.extract_activations import load_model_huggingface
     model, tokenizer = load_model_huggingface(model_key)
+
+    # Instruct models rarely refuse raw-text continuations — the refusal
+    # behavior lives in the chat format. Without this, baseline refusal rates
+    # are meaningless.
+    if getattr(tokenizer, "chat_template", None):
+        prompts = {
+            d: [
+                tokenizer.apply_chat_template(
+                    [{"role": "user", "content": p}],
+                    tokenize=False, add_generation_prompt=True,
+                )
+                for p in ps
+            ]
+            for d, ps in prompts.items()
+        }
+        logger.info("Applied tokenizer chat template to held-out prompts.")
+    else:
+        logger.warning(
+            "Tokenizer has no chat template — generating from raw text; "
+            "refusal rates for instruct models may be unreliable."
+        )
 
     results: Dict[str, dict] = {}
     for domain in domains:

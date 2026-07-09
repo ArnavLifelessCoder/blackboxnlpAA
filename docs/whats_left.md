@@ -1,8 +1,19 @@
 # What's Left — Final Stretch Checklist
 
-> Written: 2026-07-07 · Deadline: **July 17** (internal: July 14, figures: July 11)
+> Written: 2026-07-07, updated **2026-07-09** after the Jul 8 Kaggle session ·
+> Deadline: **July 17** (internal: July 14, figures: July 11)
 > Companions: `results/latest_run_summary.md` (results + reviewer fixes),
 > `docs/experimental_design.md` (validity), `docs/commands.md` (full reference).
+
+## ⚡ Jul 8 session outcome (see `results_final/`)
+
+| Job | Status |
+|---|---|
+| 1a. Analysis rerun (fixed pipeline) | ✅ All 4 reports regenerated with pair-level CIs, corrected transfer layers (refusal L3/L10 instead of L0), late-layer stats. Numbers confirm the story: refusal late-layer cos 0.93/0.91, honesty 0.69/0.67. |
+| 1b. E4 steering | ❌ **INVALID — must rerun.** Ran on **0 held-out prompts**: `data/prompt_pairs_promptbased/` is gitignored so the fresh Kaggle clone didn't have it, and the driver didn't fail on empty input. All-zero rates are `n=0`, not a null result. **Fixed 2026-07-09**: driver now hard-fails on empty prompts, applies the chat template (raw-text generations don't elicit refusal from instruct models), and notebook 03 rebuilds the prompt-based set in setup. |
+| 1c. E2′ response-based | ◑ Figures arrived (`results_final/figures/qwen_respbased/`, transfer layer 34) but the **report JSON/MD (`results/respbased/`) and the `results/balanced/` sensitivity reports are missing from the download** — recover them from the Kaggle output tab, or re-run 1a's balanced block + 1c's report step next session. |
+
+**Next session = E4 rerun (fixed driver) + recover/redo respbased + balanced reports.**
 
 ## Where things stand (30-second version)
 

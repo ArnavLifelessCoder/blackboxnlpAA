@@ -68,6 +68,13 @@ n_act = len(list(Path("results/activations").glob("*.pt")))
 print(f"activation files present: {n_act}")
 assert n_act > 0, "No cached activations — attach the Jul 6 outputs or rerun notebook 02."
 
+# data/prompt_pairs_promptbased/ is GITIGNORED — a fresh clone does not have
+# it, and steering needs it for held-out prompts. Rebuild it (deterministic):
+subprocess.check_call([sys.executable, "scripts/build_refusal_promptbased.py",
+                       "--max-per-domain", "120"])
+n_pb = len(list(Path("data/prompt_pairs_promptbased/refusal").glob("*.jsonl")))
+assert n_pb == 4, f"prompt-based rebuild produced {n_pb}/4 domain files"
+
 # %% [markdown]
 # ## 1. Analysis rerun (CPU) — fixed pipeline, all 4 reports
 
