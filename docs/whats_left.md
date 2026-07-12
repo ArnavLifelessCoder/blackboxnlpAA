@@ -45,10 +45,27 @@ See `results_summary.md` for every number the paper needs.
 - [ ] Page limit check (8 + refs), figures ≥300 DPI colorblind-safe
 - [ ] OpenReview submission — both approve first
 
-## Optional (only if time allows — NOT blocking)
-- [ ] `--balance-domains` sensitivity reports (CPU-only Kaggle session, no GPU
-  quota); otherwise it's already covered in Limitations
-- [ ] Judge-model rescoring of E4 generations instead of keyword heuristic
+## Reviewer hardening (built 2026-07-12, run via `notebooks/04_cheap_wins_kaggle.py`)
+
+Mock review flagged four weaknesses; all four analyses are now coded and
+tested (56 tests). Priority: 1 > 2 > 3 > 4; items 1–2 are CPU-only.
+
+- [ ] **1. Probe transfer matrix** (`src/analysis/probe_transfer.py`) — trains
+  a linear probe per honesty domain, tests cross-domain; gives honesty a
+  functional evidence pillar. ⚠️ Result cuts either way: high transfer means
+  the cosine fragmentation is superficial/lexical — the paper text follows
+  the data.
+- [ ] **2. n=59 balanced honesty rerun** — `run_pipeline --balance-domains`
+  (already built Jul 7), defends the math-orthogonality number.
+- [ ] **3. fp16 spot-check** — `batch_extract --no-quantization` (layers 5,
+  18) + `scripts/compare_quantization.py`; turns the T5 limitation into a
+  measured non-issue (~1h GPU).
+- [ ] **4. Steering rerun + LLM judge** — `run_steering` now persists all
+  generations to a `*_generations.jsonl` sidecar (the Jul 12 run kept only 3
+  truncated examples, so judging required a rerun); `scripts/judge_steering.py`
+  re-scores them with the study model as judge (~4h GPU).
+- [ ] Integrate results into the paper (probe matrix table in §5.2, one
+  sentence each for items 2–4).
 
 ## Admin still open
 - [ ] Sign off `docs/operational_definitions.md` (both members)

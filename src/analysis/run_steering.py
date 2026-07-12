@@ -168,6 +168,11 @@ def run_steering_experiment(
         )
 
     results: Dict[str, dict] = {}
+    # Every generation is persisted verbatim (sidecar JSONL) so refusal can be
+    # re-scored later, e.g. by a judge model, without re-running the GPU pass.
+    # The Jul 8/12 runs kept only 3 truncated examples per condition, which
+    # made judge re-scoring impossible.
+    all_generations: List[dict] = []
     for domain in domains:
         domain_prompts = prompts[domain]
         conditions = {"global": directions["global"], "own": directions[domain]}
@@ -183,6 +188,12 @@ def run_steering_experiment(
                 steering_layer=layer, steering_coeff=coeff,
                 max_new_tokens=max_new_tokens,
                 direction_source=cond_name,
+            )
+            all_generations.extend(
+                {"domain": domain, "condition": cond_name,
+                 "prompt": r.prompt, "original": r.original_output,
+                 "steered": r.steered_output}
+                for r in gen
             )
             rates = compute_refusal_rate(gen)
             domain_result[cond_name] = {
@@ -236,6 +247,12 @@ def run_steering_experiment(
     with open(out, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
     logger.info("Wrote steering report: %s", out)
+
+    gen_path = out.with_name(out.stem + "_generations.jsonl")
+    with open(gen_path, "w", encoding="utf-8") as f:
+        for g in all_generations:
+            f.write(json.dumps(g, ensure_ascii=False) + "\n")
+    logger.info("Wrote %d generations: %s", len(all_generations), gen_path)
     return report
 
 

@@ -89,6 +89,7 @@ def run_batch(
     batch_size: int = 4,
     max_pairs_per_domain: Optional[int] = None,
     dry_run: bool = False,
+    no_quant: bool = False,
 ) -> Dict[str, int]:
     """Extract activations for every domain of a concept. Returns per-domain counts."""
     by_domain = discover_pairs_by_domain(
@@ -123,6 +124,7 @@ def run_batch(
             target_layers=target_layers,
             batch_size=batch_size,
             data_source=str(data_dir),
+            no_quant=no_quant,
         )
 
     logger.info("Batch extraction complete: %d pairs over %d domains.", total, len(counts))
@@ -146,6 +148,9 @@ def main():
     parser.add_argument("--max-pairs-per-domain", type=int, default=None)
     parser.add_argument("--dry-run", action="store_true",
                         help="Report discovered pairs per domain without loading a model.")
+    parser.add_argument("--no-quantization", action="store_true",
+                        help="Load in fp16 without 4/8-bit quantization (T5 "
+                             "sensitivity check; huggingface backend only).")
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -167,6 +172,7 @@ def main():
         batch_size=args.batch_size,
         max_pairs_per_domain=args.max_pairs_per_domain,
         dry_run=args.dry_run,
+        no_quant=args.no_quantization,
     )
 
 

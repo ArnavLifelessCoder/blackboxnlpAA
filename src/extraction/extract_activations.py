@@ -157,8 +157,13 @@ def load_model_transformer_lens(model_key: str):
     return model, tokenizer
 
 
-def load_model_huggingface(model_key: str):
+def load_model_huggingface(model_key: str, no_quant: bool = False):
     """Load a model using HuggingFace Transformers (fallback).
+
+    Args:
+        no_quant: Skip the config's 4/8-bit quantization and load in fp16.
+            Used for the quantization sensitivity check (T5): extract a few
+            layers unquantized and compare direction geometry.
 
     Returns:
         (model, tokenizer) tuple.
@@ -166,14 +171,15 @@ def load_model_huggingface(model_key: str):
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     model_config = MODELS[model_key]
-    logger.info(f"Loading {model_config.name} via HuggingFace...")
+    quantization = None if no_quant else model_config.quantization
+    logger.info(f"Loading {model_config.name} via HuggingFace (quant={quantization})...")
 
     load_kwargs = {
         "torch_dtype": torch.float16 if EXTRACTION.use_fp16 else torch.float32,
         "device_map": "auto",
     }
 
-    if model_config.quantization == "4bit":
+    if quantization == "4bit":
         from transformers import BitsAndBytesConfig
         load_kwargs["quantization_config"] = BitsAndBytesConfig(
             load_in_4bit=True,
@@ -181,7 +187,7 @@ def load_model_huggingface(model_key: str):
             bnb_4bit_use_double_quant=True,
             bnb_4bit_quant_type="nf4",
         )
-    elif model_config.quantization == "8bit":
+    elif quantization == "8bit":
         from transformers import BitsAndBytesConfig
         load_kwargs["quantization_config"] = BitsAndBytesConfig(
             load_in_8bit=True,
@@ -243,6 +249,7 @@ def extract_activations_for_pairs(
     batch_size: int = 4,
     max_seq_len: int = 512,
     data_source: Optional[str] = None,
+    no_quant: bool = False,
 ) -> Tuple[Dict[int, torch.Tensor], Dict[int, torch.Tensor]]:
     model_config = MODELS[model_key]
 
@@ -256,7 +263,7 @@ def extract_activations_for_pairs(
     if backend == "transformer_lens":
         model, tokenizer = load_model_transformer_lens(model_key)
     else:
-        model, tokenizer = load_model_huggingface(model_key)
+        model, tokenizer = load_model_huggingface(model_key, no_quant=no_quant)
 
     pos_enc, neg_enc = tokenize_pairs(pairs, tokenizer, max_length=max_seq_len)
 
@@ -357,6 +364,7 @@ def extract_activations_for_pairs(
         "backend": backend,
         "layers": list(target_layers),
         "data_source": data_source,
+        "no_quant": no_quant,
         "pair_schemas": schemas,
         "framings": framings,
         "sources": sources,

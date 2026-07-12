@@ -207,6 +207,56 @@ class TestProvenanceSidecar:
         assert report["provenance"] == [meta]
 
 
+class TestProbeTransfer:
+    def _write(self, tmp_path, shared_axis=True, n=60, d=24, seed=0):
+        """Domains either share one separating axis or use orthogonal axes."""
+        rng = np.random.default_rng(seed)
+        axes = {}
+        g = rng.standard_normal(d); g /= np.linalg.norm(g)
+        for i, domain in enumerate(["a", "b", "c"]):
+            if shared_axis:
+                axes[domain] = g
+            else:
+                u = np.zeros(d); u[i] = 1.0  # orthogonal per-domain axes
+                axes[domain] = u
+            pos = {0: torch.from_numpy(
+                rng.standard_normal((n, d)) + 6.0 * axes[domain][None, :]).float()}
+            neg = {0: torch.from_numpy(rng.standard_normal((n, d))).float()}
+            save_activations(pos, tmp_path, "m", "c", domain, prefix="pos_")
+            save_activations(neg, tmp_path, "m", "c", domain, prefix="neg_")
+
+    def test_shared_axis_transfers(self, tmp_path):
+        from src.analysis.probe_transfer import probe_transfer_matrix, summarize
+        self._write(tmp_path, shared_axis=True)
+        m = probe_transfer_matrix(tmp_path, "m", "c", ["a", "b", "c"], layer=0)
+        s = summarize(m)
+        assert s["mean_within_acc"] > 0.9
+        assert s["mean_cross_acc"] > 0.85  # shared axis -> probes transfer
+
+    def test_orthogonal_axes_do_not_transfer(self, tmp_path):
+        from src.analysis.probe_transfer import probe_transfer_matrix, summarize
+        self._write(tmp_path, shared_axis=False)
+        m = probe_transfer_matrix(tmp_path, "m", "c", ["a", "b", "c"], layer=0)
+        s = summarize(m)
+        assert s["mean_within_acc"] > 0.9
+        assert s["mean_cross_acc"] < 0.75  # disjoint axes -> weak transfer
+        assert s["transfer_gap"] > 0.2
+
+    def test_balance_to_subsamples(self, tmp_path):
+        from src.analysis.probe_transfer import _domain_splits
+        self._write(tmp_path, shared_axis=True, n=60)
+        splits = _domain_splits(tmp_path, "m", "c", ["a", "b", "c"], 0,
+                                test_frac=0.25, seed=1, balance_to=20)
+        assert all(s["n_pairs"] == 20 for s in splits.values())
+
+    def test_deterministic(self, tmp_path):
+        from src.analysis.probe_transfer import probe_transfer_matrix
+        self._write(tmp_path, shared_axis=True)
+        m1 = probe_transfer_matrix(tmp_path, "m", "c", ["a", "b"], 0, seed=7)
+        m2 = probe_transfer_matrix(tmp_path, "m", "c", ["a", "b"], 0, seed=7)
+        assert m1 == m2
+
+
 class TestSteeringHeldout:
     def _write_pairs(self, tmp_path, domain, n):
         d = tmp_path / "refusal"
