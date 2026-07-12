@@ -45,7 +45,11 @@ See `results_summary.md` for every number the paper needs.
 - [ ] Page limit check (8 + refs), figures ≥300 DPI colorblind-safe
 - [ ] OpenReview submission — both approve first
 
-## Reviewer hardening (built 2026-07-12, run via `notebooks/04_cheap_wins_kaggle.py`)
+## Reviewer hardening (built 2026-07-12) — run via [`docs/kaggle_runbook.md`](kaggle_runbook.md)
+
+Step-by-step instructions for whoever runs the Kaggle session are in the
+runbook (self-contained, no other context needed). Equivalent notebook:
+`notebooks/04_cheap_wins_kaggle.py`.
 
 Mock review flagged four weaknesses; all four analyses are now coded and
 tested (56 tests). Priority: 1 > 2 > 3 > 4; items 1–2 are CPU-only.
