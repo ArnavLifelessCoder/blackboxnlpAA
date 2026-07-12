@@ -66,7 +66,7 @@ conditions: for each concept we compare directions extracted within four
 semantic domains against a direction pooled across domains, on both the
 aligned and pre-alignment checkpoints of Qwen~2.5~3B, with confounds from
 mixed data sources, templated responses, and domain imbalance explicitly
-removed. Universality holds for refusal --- per-domain and global directions
+removed. Universality holds for refusal: per-domain and global directions
 agree closely (cosine $\geq 0.83$ at every layer) under two independent
 operationalizations, and a global steering direction shifts held-out
 behavior at least as well as domain-specific ones. It fails partially for
@@ -78,7 +78,7 @@ Finally, strong refusal fragmentation that we observed in a smaller pilot
 model did not replicate on the primary model under identical data,
 cautioning against generalizing single-model geometry findings. Universality
 is thus a property of particular concepts at particular depths in particular
-models --- not of concept directions as such.
+models, not of concept directions as such.
 \end{abstract}
 
 % ============================================================
@@ -86,9 +86,9 @@ models --- not of concept directions as such.
 \label{sec:intro}
 
 A growing body of interpretability work holds that large language models
-encode high-level concepts --- honesty, refusal, harmfulness --- as linear
-directions in activation space \citep{zou2023representation,
-marks2023geometry}. The practical appeal is obvious: if a concept is one
+encode high-level concepts such as honesty, refusal, and harmfulness as
+linear directions in activation space \citep{zou2023representation,
+marks2023geometry}. The practical appeal is clear: if a concept is one
 vector, it can be monitored with a dot product and controlled by adding that
 vector back into the residual stream \citep{turner2023activation,
 li2024inference}. Safety applications built on this premise, from refusal
@@ -122,27 +122,26 @@ whether RLHF amplifies or suppresses whatever structure exists. Two of our
 three pre-registered hypotheses predicted failure of universality; we report
 what we found rather than what we predicted.
 
-Our findings are fourfold. \textbf{(1)}~Refusal directions are largely
+We report four findings. \textbf{(1)}~Refusal directions are largely
 universal: per-domain and global directions agree with cosine similarity
 0.83--0.94 across all layers, under both operationalizations
-(\S\ref{sec:results-refusal}). \textbf{(2)}~Honesty is not: early- and
+(\S\ref{sec:results-refusal}). \textbf{(2)}~Honesty is not. Early- and
 middle-layer directions fragment sharply (mean cosine 0.52 at layer~5, with
 the math domain near-orthogonal to every other), reconverging only partially
 by the output layers (\S\ref{sec:results-honesty}). \textbf{(3)}~The
 geometry is behaviorally real: a single global refusal direction steers
 held-out prompts in every domain at least as well as that domain's own
 direction (\S\ref{sec:results-steering}). \textbf{(4)}~Alignment does not
-fragment concept representations --- the Instruct checkpoint is marginally
-\emph{more} universal than its Base (\S\ref{sec:results-rlhf}) --- and
-fragmentation observed on a smaller pilot model failed to replicate under
-identical data (\S\ref{sec:results-pilot}).
+fragment concept representations; the Instruct checkpoint is in fact
+marginally \emph{more} universal than its Base (\S\ref{sec:results-rlhf}).
+In addition, fragmentation observed on a smaller pilot model failed to
+replicate under identical data (\S\ref{sec:results-pilot}).
 
-Taken together, the results neither vindicate nor refute representation
-engineering; they bound it. Universality is real where it has been most
-prominently claimed (refusal), fails quietly elsewhere (honesty, early
-depth), and varies across models in ways the field's single-model
-methodology cannot detect. We release the full pipeline, data manifests, and
-validation tooling.
+These results neither vindicate nor refute representation engineering; they
+bound it. Universality is real where it has been most prominently claimed
+(refusal), fails elsewhere (honesty, early depth), and varies across models
+in ways that single-model studies cannot detect. We release the full
+pipeline, data manifests, and validation tooling.
 
 
 % ============================================================
@@ -159,8 +158,8 @@ linearly in middle-layer activations, and \citet{hernandez2023linearity}
 found that many relational mappings are well approximated by linear
 transformations. This literature generally extracts one direction per
 concept per model and evaluates it in-distribution; the cross-domain
-generalization of a single direction --- the property our study isolates ---
-is usually assumed rather than measured.
+generalization of a single direction, the property our study isolates, is
+usually assumed rather than measured.
 
 \paragraph{Activation steering.}
 Adding a scaled direction to the residual stream at inference time shifts
@@ -175,9 +174,9 @@ the observation that the account does not automatically carry over to other
 concepts or, apparently, to other models.
 
 \paragraph{Alignment and its footprint on representations.}
-\citet{wei2024assessing} demonstrate that safety alignment is brittle ---
-removable with small parameter changes --- which motivates our question of
-what alignment actually does to concept geometry. We find its footprint on
+\citet{wei2024assessing} demonstrate that safety alignment is brittle, in
+the sense that small parameter changes suffice to remove it, which motivates
+our question of what alignment actually does to concept geometry. We find its footprint on
 direction dispersion to be small and, if anything, consolidating. Finally,
 our non-replication across model scales echoes the concern of
 \citet{lieberum2023does} that interpretability findings established on one
@@ -192,13 +191,12 @@ level of concept-direction geometry.
 Our design asks a simple question of the representation-engineering
 framework: if a concept direction is extracted from data spanning several
 semantic domains, how well does it agree with directions extracted from each
-domain alone? We operationalize this for two concepts --- \textit{honesty}
-and \textit{refusal} --- each decomposed into four domains, and measure
-agreement both geometrically (angular dispersion) and behaviorally
-(activation steering on held-out prompts). Crucially, the design controls
-for the confounds that would otherwise masquerade as fragmentation: source
-datasets that differ across domains, templated responses, and unbalanced
-domain sizes.
+domain alone? We operationalize this for two concepts, \textit{honesty} and
+\textit{refusal}, each decomposed into four domains, and measure agreement
+both geometrically (angular dispersion) and behaviorally (activation
+steering on held-out prompts). The design controls for the confounds that
+would otherwise masquerade as fragmentation: source datasets that differ
+across domains, templated responses, and unbalanced domain sizes.
 
 \subsection{Contrastive Data}
 \label{sec:prompts}
@@ -207,8 +205,8 @@ domain sizes.
 Domain must be the only factor that varies between the groups we compare, so
 our primary experiment draws all of its data from a single source. We
 partition the 817 questions of TruthfulQA \citep{lin2022truthfulqa} into
-four domains by category --- \textit{factual trivia}, \textit{math},
-\textit{politics/opinion}, and \textit{personal advice} --- supplemented
+four domains by category (\textit{factual trivia}, \textit{math},
+\textit{politics/opinion}, and \textit{personal advice}), supplemented
 with 30 hand-written arithmetic pairs to populate the math domain. Each item
 pairs a question with its best truthful answer (positive) and a plausible
 falsehood (negative); activations are read from the concatenation of the
@@ -314,8 +312,8 @@ indistinguishable.
 \subsection{RLHF Comparison}
 \label{sec:rlhf-method}
 
-To isolate the effect of alignment we repeat the entire pipeline ---
-extraction, direction computation, and dispersion analysis --- on the Base
+To isolate the effect of alignment we repeat the entire pipeline
+(extraction, direction computation, and dispersion analysis) on the Base
 checkpoint, which shares the pre-training of the Instruct model but has
 undergone no preference tuning, and compare
 $\overline{\cosim}_\ell$ layer by layer across the two checkpoints. The
@@ -422,9 +420,9 @@ condition agrees: despite an entirely different contrast construction, mean
 cosines span 0.854--0.927 (pair-level 95\% CI at the most dispersed layer:
 $[0.791, 0.885]$), with a late-layer mean of 0.904. Whatever the network
 uses to decide refusal, it points in essentially the same direction whether
-the request concerns violence, illegal activity, medical ethics, or privacy
---- consistent with the single-direction account of
-\citet{arditi2024refusal}, and now shown to be stable across two
+the request concerns violence, illegal activity, medical ethics, or privacy.
+This is consistent with the single-direction account of
+\citet{arditi2024refusal}, and shows that the account is stable across two
 operationalizations of the concept.
 
 \subsection{Honesty Fragments in Early and Middle Layers}
@@ -450,12 +448,11 @@ operationalizations of the concept.
 
 Honesty behaves differently
 (Figures~\ref{fig:honesty-heatmap} and~\ref{fig:honesty-pca}). The mean
-cosine to the global direction falls
-to 0.522 at layer~5 --- a mean angle of $57^\circ$ --- and the domain
-structure at that depth is stark: the math direction is essentially
-orthogonal to every other domain (pairwise cosines between $-0.10$ and
-$-0.03$), and even the best-aligned pair, factual trivia and personal
-advice, reaches only 0.34. Dispersion then decays with depth, but only
+cosine to the global direction falls to 0.522 at layer~5, a mean angle of
+$57^\circ$. At that depth the math direction is essentially orthogonal to
+every other domain (pairwise cosines between $-0.10$ and $-0.03$), and even
+the best-aligned pair, factual trivia and personal advice, reaches only
+0.34. Dispersion then decays with depth, but only
 partially: the final-third mean of 0.694 remains well below the
 corresponding refusal values. Universality is thus not a property of concept
 directions per se, but of particular concepts at particular depths. We note
@@ -488,20 +485,20 @@ between honesty and refusal, however, survives this caveat.
   \label{tab:steering}
 \end{table}
 
-The second hypothesis --- that global steering underperforms domain-specific
-steering --- also fails, in the direction favorable to universality
-(Table~\ref{tab:steering}). In every domain the global direction shifts
+The second hypothesis, that global steering underperforms domain-specific
+steering, also fails, and it fails in the direction favorable to
+universality (Table~\ref{tab:steering}). In every domain the global direction shifts
 behavior at least as much as the domain's own direction, and in two domains
 strictly more (medical/legal: $-0.15$ vs.\ $0.00$; privacy: $-0.40$ vs.\
 $-0.15$). Cross-domain directions transfer as well: privacy prompts are
 steered as strongly by the violence and illegal-activity directions
 ($-0.40$) as by the global one. We attribute the weaker own-domain effects
-to estimation noise --- each per-domain direction is fit on roughly a
-quarter of the data --- which is itself an argument for pooling. Two
-patterns deserve note: absolute effects are modest at this coefficient, and
-the violence domain is behaviorally immovable (baseline refusal 0.95,
-unchanged under every direction), suggesting refusal of violent requests is
-enforced more redundantly than a single rank-one intervention can undo.
+to estimation noise, since each per-domain direction is fit on roughly a
+quarter of the data; this is itself an argument for pooling. Two caveats:
+absolute effects are modest at this coefficient, and the violence domain is
+behaviorally immovable (baseline refusal 0.95, unchanged under every
+direction), suggesting refusal of violent requests is enforced more
+redundantly than a single rank-one intervention can undo.
 
 \subsection{RLHF Does Not Amplify Fragmentation}
 \label{sec:results-rlhf}
@@ -514,17 +511,18 @@ and the gap widening toward the output (honesty at layer 35: 0.690 Base
 vs.\ 0.769 Instruct). Only 10 of 36 layers move in the predicted direction,
 none substantially. Base--Instruct differences in individual per-domain
 cosines grow with depth (up to 0.20), the expected signature of a fine-tune,
-confirming that the two checkpoints genuinely diverge --- alignment simply
-does not diverge them along the axis we hypothesized. If anything,
-preference tuning appears to \emph{consolidate} concept representations.
+confirming that the two checkpoints genuinely diverge; alignment simply does
+not move them apart along the axis we hypothesized. If anything, preference
+tuning appears to \emph{consolidate} concept representations.
 
 \subsection{A Cautionary Non-Replication}
 \label{sec:results-pilot}
 
 Our pilot on Gemma~2~2B, run on the response-based refusal data, showed what
 looked like strong fragmentation: a minimum mean cosine of 0.559 and
-near-orthogonal domain pairs. None of this survives on Qwen~2.5~3B --- the
-same data recipe yields cosines of 0.85 and above (\S\ref{sec:results-refusal}).
+near-orthogonal domain pairs. None of this survives on Qwen~2.5~3B, where
+the same data recipe yields cosines of 0.85 and above
+(\S\ref{sec:results-refusal}).
 We initially suspected dataset artifacts (mixed sources, templated
 responses), but the prompt-based and response-based conditions agree on
 Qwen, ruling that explanation out. The fragmentation was a property of the
@@ -546,8 +544,8 @@ extraction recipes, and causally effective wherever we tested it. Honesty
 does not. Its early- and middle-layer directions are so domain-specific that
 the math direction is orthogonal to the rest, and even at the output layers
 the domains agree far less than refusal domains do. One plausible mechanism
-is that refusal is a comparatively unified \emph{behavior} --- a decision the
-model renders in a recognizable surface form regardless of topic --- whereas
+is that refusal is a comparatively unified \emph{behavior}, a decision the
+model renders in a recognizable surface form regardless of topic, whereas
 honesty is a property of content, entangled with whatever domain knowledge
 the content draws on. Deciding \emph{to} refuse may be one computation;
 being right about arithmetic and being right about geography need not be.
@@ -558,8 +556,8 @@ single pooled refusal direction is not silently missing domains, and pooling
 across domains is actively preferable, since per-domain directions are
 noisier estimates of the same axis (\S\ref{sec:results-steering}). The
 honesty result carries the opposite warning. Interventions aimed at
-truthfulness that are calibrated on one distribution --- trivia-style
-benchmarks being the common choice --- have no guarantee of engaging the
+truthfulness that are calibrated on one distribution (in practice, usually
+trivia-style benchmarks) have no guarantee of engaging the
 representations the model uses in other domains, particularly if they
 intervene at early or middle depth. Probing and steering studies for
 content-dependent concepts should report which domains their direction was
@@ -570,11 +568,11 @@ We hypothesized that preference tuning, which rewards domain-sensitive
 caution, would splinter concept directions. The data say otherwise: the
 aligned checkpoint's directions are marginally more coherent than the base
 model's, with the gain concentrated in late layers. A speculative but
-consistent interpretation is that alignment training pressures the model
-toward a common decision variable --- one refusal axis that many domains
-feed --- because the reward signal itself is largely domain-general. Whatever
-the mechanism, concept-level interventions on aligned models do not appear
-to face a fragmentation penalty relative to base models.
+consistent interpretation is that alignment training pushes the model
+toward a common decision variable, one refusal axis that many domains feed,
+because the reward signal itself is largely domain-general. Whatever the
+mechanism, concept-level interventions on aligned models do not appear to
+face a fragmentation penalty relative to base models.
 
 \paragraph{The pilot that did not replicate.}
 We initially interpreted the strong fragmentation in our Gemma~2~2B pilot as
@@ -583,8 +581,8 @@ controlled comparison dismantled both the finding and our explanation of it:
 on Qwen the same data recipe produces near-perfect universality, so the
 fragmentation was a property of the model, not the data. We highlight this
 as a methodological point in its own right. Geometry measured on a single
-model is a case study, and the field's habit --- ours included --- of
-generalizing from one open model deserves more suspicion than it gets.
+model is a case study, and the common habit, ours included, of generalizing
+from one open model deserves more suspicion than it gets.
 Whether the difference reflects scale (2B vs.\ 3B), family, or training data
 is a question our compute budget could not answer.
 
@@ -607,8 +605,8 @@ analysis is left to future work.
 Directions are read at the final token position and assumed linear;
 concept structure that is nonlinear, distributed across positions, or
 rank-greater-than-one is invisible to our measures. Early-layer honesty
-fragmentation may be partly lexical --- arithmetic text simply differs from
-trivia text at the surface --- which is why we lean on late-layer and
+fragmentation may be partly lexical, since arithmetic text simply differs
+from trivia text at the surface; this is why we lean on late-layer and
 behavioral evidence, but the two cannot be fully disentangled here.
 
 \paragraph{Steering protocol.}
@@ -630,14 +628,13 @@ We set out to show that concept directions fragment across semantic domains
 and that alignment makes it worse. Under controls strict enough to trust,
 neither claim survived for refusal, both survived in weakened form for
 honesty, and a dramatic fragmentation result from our own pilot model turned
-out not to generalize. The constructive summary for the field is a scoping
-rule: a concept direction is universal exactly to the extent that the
-concept is a unified behavior rather than domain-entangled content, and that
-extent must be measured --- per concept, per depth, per model --- rather than
-assumed. The controlled comparison that yields such measurements costs
-little beyond the extraction runs practitioners already perform, and we
-release our pipeline so that reporting one becomes the path of least
-resistance.
+out not to generalize. The constructive summary is a scoping rule: a concept direction is universal
+to the extent that the concept is a unified behavior rather than
+domain-entangled content, and that extent has to be measured for each
+concept, depth, and model rather than assumed. The controlled comparison
+that yields such measurements costs little beyond the extraction runs
+practitioners already perform, and we release our pipeline so that reporting
+one becomes the path of least resistance.
 
 
 % ============================================================
