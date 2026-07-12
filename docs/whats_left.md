@@ -5,7 +5,22 @@
 > Companions: `results/latest_run_summary.md` (results + reviewer fixes),
 > `docs/experimental_design.md` (validity), `docs/commands.md` (full reference).
 
-## ⚡ Jul 8 session outcome (see `results_final/`)
+## ⚡ Jul 12 session outcome (see `new_results_final/`) — E4 + E2′ VALID ✅
+
+| Job | Status |
+|---|---|
+| **E4 steering (coeff 4.0, L18, n=20/domain)** | ✅ **Valid** (baselines 0.50–0.95). Result: **global steering ≥ own-domain steering in every domain** (own−global: 0.00, 0.00, +0.15, +0.25) → **H2 not supported** — behavioral confirmation of refusal universality. Effects modest: privacy −0.40 refusal w/ global, medical −0.15, violence immovable (baseline 0.95, all deltas 0.00). ⚠️ coeff-2.0 run was overwritten by coeff-4.0 (filename lacked coeff — fixed 2026-07-12); only 4.0 survives. |
+| **E2′ response-based refusal (Qwen Instruct)** | ✅ Report in `new_results_final/respbased/`. **Surprise: also universal** (mean cos 0.85–0.92 across layers, late 0.904, pair-level CI at min layer [0.791, 0.885]). The Gemma pilot's fragmentation (0.56) does NOT reproduce on Qwen even with the same response-based data → the pilot's fragmentation was **model-specific (Gemma 2B), not purely dataset-driven**. ⚠️ This weakens the "dataset confound manufactures fragmentation" claim — reframe as a model-scale/family observation, not a proven confound (see paper notes below). |
+| Balanced sensitivity reports | ❌ Still missing (`results/balanced/` not in download). CPU-only; run in any Kaggle session (no GPU quota) or accept as limitation. |
+
+**Paper storyline (updated):** refusal directions are robustly universal in Qwen
+across BOTH operationalizations (prompt-based AND response-based), confirmed
+behaviorally (global steers ≥ per-domain); honesty fragments early-mid layers
+(concept-dependence); RLHF does not amplify; the Gemma-2B pilot fragmentation
+did not replicate on the larger model — flag as scale/family question, don't
+overclaim the dataset-confound story.
+
+## Jul 8 session outcome (superseded — see `results_final/`)
 
 | Job | Status |
 |---|---|

@@ -229,7 +229,10 @@ def run_steering_experiment(
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    out = output_dir / f"steering_{concept}_{model_key}_layer{layer:03d}.json"
+    # Coeff is part of the name so sweep runs don't overwrite each other
+    # (the Jul 12 coeff-2.0 run was lost to the coeff-4.0 run this way).
+    coeff_tag = f"{coeff:g}".replace(".", "p").replace("-", "m")
+    out = output_dir / f"steering_{concept}_{model_key}_layer{layer:03d}_coeff{coeff_tag}.json"
     with open(out, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
     logger.info("Wrote steering report: %s", out)
