@@ -12,23 +12,22 @@
 
 \documentclass[11pt]{article}
 
-% === ACL 2025 style (download acl.sty separately) ===
-% If using the official ACL style file, uncomment the next line:
-% \usepackage[review]{acl}
-% For now, use a compatible setup:
-\usepackage[margin=1in]{geometry}
-\usepackage{times}
-\usepackage{latexsym}
-\usepackage{natbib}
+% === Official ACL style (acl.sty vendored in this directory) ===
+% [review] adds line numbers + anonymization for submission;
+% switch to \usepackage[final]{acl} for camera-ready.
+\usepackage[review]{acl}
 
 % === Standard packages ===
-\usepackage[utf8]{inputenc}
+% NOTE: acl.sty already loads natbib and hyperref and sets the two-column
+% *ACL page geometry -- do not load geometry/natbib/hyperref again.
+\usepackage{times}
+\usepackage{latexsym}
 \usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
-\usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{subcaption}
 \usepackage{multirow}
@@ -43,17 +42,17 @@
 % === Metadata ===
 \title{How Universal Are Concept Directions? \\ A Controlled Stress-Test of Representation Engineering Under RLHF}
 
+% ACL author blocks are separated with \And / \AND (not \and); under
+% [review] the block is hidden automatically for anonymity.
 \author{
   Author A \\
-  \textit{Affiliation} \\
+  Affiliation \\
   \texttt{email@example.com}
-  \and
+  \And
   Author B \\
-  \textit{Affiliation} \\
+  Affiliation \\
   \texttt{email@example.com}
 }
-
-\date{}
 
 \begin{document}
 \maketitle
