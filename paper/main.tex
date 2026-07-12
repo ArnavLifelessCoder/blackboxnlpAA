@@ -393,11 +393,31 @@ tooling are released with the paper.
 \subsection{Refusal Directions Are Largely Universal}
 \label{sec:results-refusal}
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/fig_refusal_dispersion.pdf}
+  \caption{Layer-wise mean cosine between per-domain and global refusal
+  directions (prompt-based, Qwen~2.5~3B Instruct). The profile stays high
+  across the entire network.}
+  \label{fig:refusal-disp}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/fig_respbased_dispersion.pdf}
+  \caption{The same profile under the response-based operationalization.
+  Despite an entirely different contrast construction, refusal directions
+  remain near-universal.}
+  \label{fig:respbased-disp}
+\end{figure}
+
 Contrary to our first pre-registered hypothesis, refusal shows little domain
 structure. Under the prompt-based condition, the mean cosine between
 per-domain and global directions never drops below 0.837 at any of the 36
 layers of Qwen~2.5~3B Instruct, and averages 0.928 over the final third of
-the network (Table~\ref{tab:dispersion}). The response-based robustness
+the network (Table~\ref{tab:dispersion}; Figure~\ref{fig:refusal-disp}
+traces the full layer profile, and Figure~\ref{fig:respbased-disp} the
+response-based replication). The response-based robustness
 condition agrees: despite an entirely different contrast construction, mean
 cosines span 0.854--0.927 (pair-level 95\% CI at the most dispersed layer:
 $[0.791, 0.885]$), with a late-layer mean of 0.904. Whatever the network
@@ -410,7 +430,27 @@ operationalizations of the concept.
 \subsection{Honesty Fragments in Early and Middle Layers}
 \label{sec:results-honesty}
 
-Honesty behaves differently. The mean cosine to the global direction falls
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/fig_honesty_heatmap.pdf}
+  \caption{Cosine similarity of each honesty domain's direction to the
+  global direction, by domain and layer (Qwen~2.5~3B Instruct). Early and
+  middle layers fragment; the math domain diverges most.}
+  \label{fig:honesty-heatmap}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/fig_honesty_pca.pdf}
+  \caption{PCA projection of per-domain and global honesty directions
+  across layers. Domain directions occupy visibly distinct regions rather
+  than collapsing onto a single axis.}
+  \label{fig:honesty-pca}
+\end{figure}
+
+Honesty behaves differently
+(Figures~\ref{fig:honesty-heatmap} and~\ref{fig:honesty-pca}). The mean
+cosine to the global direction falls
 to 0.522 at layer~5 --- a mean angle of $57^\circ$ --- and the domain
 structure at that depth is stark: the math direction is essentially
 orthogonal to every other domain (pairwise cosines between $-0.10$ and
@@ -607,7 +647,8 @@ resistance.
 
 
 % ============================================================
-\bibliographystyle{acl_natbib}
+% acl.sty already issues \bibliographystyle{acl_natbib}; issuing it again
+% triggers BibTeX's "Illegal, another \bibstyle command".
 \bibliography{references}
 
 % ============================================================
