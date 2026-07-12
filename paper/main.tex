@@ -114,92 +114,308 @@
 \section{Methods}
 \label{sec:methods}
 
-\subsection{Contrastive Prompt Pairs}
+Our design asks a simple question of the representation-engineering
+framework: if a concept direction is extracted from data spanning several
+semantic domains, how well does it agree with directions extracted from each
+domain alone? We operationalize this for two concepts --- \textit{honesty}
+and \textit{refusal} --- each decomposed into four domains, and measure
+agreement both geometrically (angular dispersion) and behaviorally
+(activation steering on held-out prompts). Crucially, the design controls
+for the confounds that would otherwise masquerade as fragmentation: source
+datasets that differ across domains, templated responses, and unbalanced
+domain sizes.
+
+\subsection{Contrastive Data}
 \label{sec:prompts}
 
-% Describe:
-% - Concept definitions (refusal, honesty) — reference operational definitions
-% - Domain decomposition (4 domains per concept)
-% - Prompt pair construction: positive (concept-expressing) vs. negative
-% - Sources: hand-written, TruthfulQA, AdvBench
-% - Quality control: annotator agreement, length matching
+\paragraph{Honesty (primary).}
+Domain must be the only factor that varies between the groups we compare, so
+our primary experiment draws all of its data from a single source. We
+partition the 817 questions of TruthfulQA \citep{lin2022truthfulqa} into
+four domains by category --- \textit{factual trivia}, \textit{math},
+\textit{politics/opinion}, and \textit{personal advice} --- supplemented
+with 30 hand-written arithmetic pairs to populate the math domain. Each item
+pairs a question with its best truthful answer (positive) and a plausible
+falsehood (negative); activations are read from the concatenation of the
+shared question and each response, so the question itself cancels in the
+contrast and the measured difference isolates the response.
+
+\paragraph{Refusal.}
+We construct the refusal contrast in two independent ways. The
+\textbf{prompt-based} condition follows the now-standard recipe of
+\citet{arditi2024refusal}: harmful instructions (drawn from AdvBench
+\citep{zou2023universal} and MedSafetyBench \citep{han2024medsafetybench},
+plus hand-written privacy requests to balance the smallest domain) are
+contrasted with harmless instructions, read at the final prompt token, with
+no model responses involved. This is our headline refusal condition, as it
+is immune to response templating. The \textbf{response-based} condition
+pairs the same harmful prompts with compliant versus refusing responses; the
+refusals were programmatically diversified so that no phrasing dominates the
+negative class. We treat this second condition purely as a robustness check,
+since synthetic responses risk encoding surface templates rather than the
+target behavior. All pairs carry a framing tag distinguishing
+harmful-request refusal from over-refusal of benign requests, and the two
+framings are never pooled.
+
+\paragraph{Balance.}
+Because a global direction computed over unbalanced domains is dominated by
+the largest one, we cap every domain at 120 pairs at extraction time
+(prompt-based refusal is balanced at roughly 91--100 prompts per domain by
+construction). The full dataset comprises 1{,}720 validated pairs; an
+automated validator checks schema conformity, duplicate rates, and response
+diversity for every file.
 
 \subsection{Activation Extraction}
 \label{sec:extraction}
 
-% Describe:
-% - Model family: Qwen 2.5 3B (Instruct + Base)
-% - Residual stream activations at all layers
-% - Last-token position extraction
-% - Hook point: resid_post
+Our primary models are Qwen~2.5~3B Instruct and its pre-alignment Base
+checkpoint \citep{qwen2024qwen25}; Gemma~2~2B \citep{gemmateam2024gemma2}
+serves as a pilot. For each prompt we record the post-block residual stream
+at every layer (36 for Qwen, 26 for Gemma) at the final token position, in
+half precision with NF4 4-bit weight quantization
+\citep{dettmers2023qlora} to fit commodity GPUs; we return to the possible
+effects of quantization in the Limitations. Extraction metadata (source
+files, schemas, pair counts) is written alongside the cached activations so
+that every downstream number is traceable to its data.
 
 \subsection{Direction Computation}
 \label{sec:directions}
 
-% Describe:
-% - Difference-of-means: d = mean(positive) - mean(negative)
-% - Per-domain directions: computed within each domain
-% - Global direction: computed across all domains
-% - Normalization
+Following \citet{zou2023representation}, the concept direction at layer
+$\ell$ is the difference of means
+\begin{equation}
+  \vdir_\ell \;=\;
+  \frac{1}{|P|}\sum_{x \in P} \vact_\ell(x)
+  \;-\;
+  \frac{1}{|N|}\sum_{x \in N} \vact_\ell(x),
+\end{equation}
+normalized to unit length, where $P$ and $N$ are the positive and negative
+activation sets and $\vact_\ell(x) \in \R^{\dmodel}$ is the residual-stream
+activation. Per-domain directions $\vdir_\ell^{(d)}$ use only pairs from
+domain $d$; the global direction $\vdir_\ell^{(g)}$ pools all domains after
+balancing.
 
-\subsection{Angular Dispersion Analysis}
+\subsection{Angular Dispersion and Statistics}
 \label{sec:angular}
 
-% Describe:
-% - Cosine similarity between per-domain and global directions
-% - Layer-wise analysis
-% - Bootstrap confidence intervals
+Fragmentation at layer $\ell$ is summarized by the mean cosine similarity
+between each per-domain direction and the global direction,
+$\overline{\cosim}_\ell = \tfrac{1}{4}\sum_d
+\cos\!\big(\vdir_\ell^{(d)}, \vdir_\ell^{(g)}\big)$,
+together with the corresponding mean angle. A value near~1 indicates a
+single shared axis; lower values indicate domain-specific structure. We also
+report the full pairwise domain-by-domain cosine matrix at the most
+fragmented layer, excluding the two embedding-adjacent layers, whose
+directions reflect token statistics rather than concept representations.
+Confidence intervals are obtained by a \emph{pair-level} bootstrap: in each
+of 1{,}000 resamples we redraw prompt pairs with replacement within every
+domain, recompute all per-domain and global directions from scratch, and
+recompute the dispersion statistic. This propagates sampling variability in
+the underlying data, rather than resampling the four domain cosines
+themselves. Because early layers of a causal language model are dominated by
+lexical features, we additionally report the mean cosine over the final
+third of the network, where representations feed the unembedding and
+behavior is read out.
 
-\subsection{Steering Transfer Test}
-\label{sec:steering}
+\subsection{Behavioral Steering}
+\label{sec:steering-method}
 
-% Describe:
-% - Apply global direction to held-out domain prompts
-% - Measure shift in model behavior
-% - Cross-domain transfer matrix: domain A direction on domain B prompts
+Geometry alone cannot establish that two directions are functionally
+interchangeable, so we test transfer behaviorally with activation addition
+\citep{turner2023activation,li2024inference}. For each refusal domain we
+hold out 20 harmful prompts that were never used for direction computation,
+format them with the model's chat template, and generate 64 tokens greedily
+under three conditions: unsteered, steered with the global direction, and
+steered with the domain's own direction (plus each other domain's direction
+in a cross-domain sweep). The direction, scaled by a coefficient of 4.0, is
+added to the residual stream at layer 18 at every token position; its sign
+points from refusal toward compliance, so effective steering should
+\emph{reduce} the refusal rate on harmful prompts. Refusals are detected by
+keyword matching over a standard set of refusal markers. If concept
+directions fragment, a domain's own direction should outperform the global
+one on that domain's prompts; if they are universal, the two should be
+indistinguishable.
 
 \subsection{RLHF Comparison}
-\label{sec:rlhf}
+\label{sec:rlhf-method}
 
-% Describe:
-% - Same analysis on Base vs. Instruct checkpoints
-% - Compare angular dispersion: does RLHF increase or decrease fragmentation?
+To isolate the effect of alignment we repeat the entire pipeline ---
+extraction, direction computation, and dispersion analysis --- on the Base
+checkpoint, which shares the pre-training of the Instruct model but has
+undergone no preference tuning, and compare
+$\overline{\cosim}_\ell$ layer by layer across the two checkpoints. The
+pre-registered hypothesis was that alignment \emph{increases} dispersion. As
+a sanity check that the checkpoints genuinely differ, we verify that
+per-domain cosine differences between Base and Instruct grow with depth, the
+expected signature of a fine-tune.
 
 
 % ============================================================
 \section{Experimental Setup}
 \label{sec:setup}
 
-% Models, compute, hyperparameters table
-% Number of prompt pairs per domain
-% Statistical methodology
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{lll}
+    \toprule
+    & \textbf{Honesty} & \textbf{Refusal} \\
+    \midrule
+    Source & TruthfulQA & AdvBench, MedSafety- \\
+           &            & Bench, hand-written \\
+    Domains & 4 & 4 \\
+    Pairs/domain & $\le$120 (math 59) & 91--120 \\
+    Contrast & true vs.\ false & harmful vs.\ harmless \\
+             & answer & prompt (+ resp.\ variant) \\
+    \bottomrule
+  \end{tabular}
+  \caption{Data summary. Both concepts are additionally extracted from the
+  Qwen~2.5~3B Base checkpoint for the RLHF comparison.}
+  \label{tab:setup}
+\end{table}
+
+All experiments ran on single T4/P100 GPUs (roughly 25 GPU-hours in total);
+analysis is CPU-only and fully scripted, from cached activations to the
+figures in this paper. We use greedy decoding throughout the steering
+experiments and fix all random seeds; the mock-data mode of the released
+pipeline reproduces every table in this paper end-to-end on synthetic
+activations before any GPU is touched. Code, data manifests, and validation
+tooling are released with the paper.
 
 
 % ============================================================
 \section{Results}
 \label{sec:results}
 
-% TODO: Fill in after Phase 3
+% NOTE: copy figure PDFs into paper/figures/ before compiling, e.g.
+%   cp new_results_final/figures/qwen/*.pdf paper/figures/
+%   cp "new_results_final/figures/qwen respbased/"*.pdf paper/figures/respbased_...
 
-\subsection{Angular Dispersion}
-\label{sec:results-angular}
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Condition} & \textbf{Min $\overline{\cosim}$} & \textbf{Layer} & \textbf{Late third} \\
+    \midrule
+    Refusal (prompt)    & 0.837 & 0  & 0.928 \\
+    Refusal (response)  & 0.854 & 0  & 0.904 \\
+    Honesty             & 0.522 & 5  & 0.694 \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Base checkpoint}} \\
+    Refusal (prompt)    & 0.834 & 0  & 0.911 \\
+    Honesty             & 0.522 & 5  & 0.667 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Angular dispersion on Qwen~2.5~3B: minimum mean cosine between
+  per-domain and global directions across layers, and the mean over the final
+  third of the network. Refusal directions are close to a single axis
+  throughout; honesty directions diverge sharply in early-mid layers and only
+  partially reconverge.}
+  \label{tab:dispersion}
+\end{table}
 
-% Heatmap: domain × layer → cosine similarity with global direction
+\subsection{Refusal Directions Are Largely Universal}
+\label{sec:results-refusal}
 
-\subsection{Steering Transfer}
+Contrary to our first pre-registered hypothesis, refusal shows little domain
+structure. Under the prompt-based condition, the mean cosine between
+per-domain and global directions never drops below 0.837 at any of the 36
+layers of Qwen~2.5~3B Instruct, and averages 0.928 over the final third of
+the network (Table~\ref{tab:dispersion}). The response-based robustness
+condition agrees: despite an entirely different contrast construction, mean
+cosines span 0.854--0.927 (pair-level 95\% CI at the most dispersed layer:
+$[0.791, 0.885]$), with a late-layer mean of 0.904. Whatever the network
+uses to decide refusal, it points in essentially the same direction whether
+the request concerns violence, illegal activity, medical ethics, or privacy
+--- consistent with the single-direction account of
+\citet{arditi2024refusal}, and now shown to be stable across two
+operationalizations of the concept.
+
+\subsection{Honesty Fragments in Early and Middle Layers}
+\label{sec:results-honesty}
+
+Honesty behaves differently. The mean cosine to the global direction falls
+to 0.522 at layer~5 --- a mean angle of $57^\circ$ --- and the domain
+structure at that depth is stark: the math direction is essentially
+orthogonal to every other domain (pairwise cosines between $-0.10$ and
+$-0.03$), and even the best-aligned pair, factual trivia and personal
+advice, reaches only 0.34. Dispersion then decays with depth, but only
+partially: the final-third mean of 0.694 remains well below the
+corresponding refusal values. Universality is thus not a property of concept
+directions per se, but of particular concepts at particular depths. We note
+that early-layer divergence may partly reflect lexical differences between
+domains (arithmetic text simply looks different from trivia questions), which
+is one reason we insist on the behavioral test below; the late-layer gap
+between honesty and refusal, however, survives this caveat.
+
+\subsection{Steering Confirms the Geometry}
 \label{sec:results-steering}
 
-% Transfer matrix: domain A direction effectiveness on domain B prompts
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Domain} & \textbf{Baseline} & \textbf{Global $\Delta$} & \textbf{Own $\Delta$} \\
+    \midrule
+    violence          & 0.95 & \phantom{$-$}0.00 & \phantom{$-$}0.00 \\
+    illegal activity  & 0.90 & $-$0.05 & $-$0.05 \\
+    medical/legal     & 0.50 & $-$0.15 & \phantom{$-$}0.00 \\
+    privacy           & 0.50 & $-$0.40 & $-$0.15 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Behavioral steering on held-out harmful prompts (Qwen~2.5~3B
+  Instruct, layer 18, coefficient 4.0, $n{=}20$ per domain). Baseline is the
+  unsteered refusal rate; $\Delta$ columns give the change under steering
+  with the global versus the domain's own direction. The global direction is
+  never worse than the domain-specific one.}
+  \label{tab:steering}
+\end{table}
 
-\subsection{RLHF Effect}
+The second hypothesis --- that global steering underperforms domain-specific
+steering --- also fails, in the direction favorable to universality
+(Table~\ref{tab:steering}). In every domain the global direction shifts
+behavior at least as much as the domain's own direction, and in two domains
+strictly more (medical/legal: $-0.15$ vs.\ $0.00$; privacy: $-0.40$ vs.\
+$-0.15$). Cross-domain directions transfer as well: privacy prompts are
+steered as strongly by the violence and illegal-activity directions
+($-0.40$) as by the global one. We attribute the weaker own-domain effects
+to estimation noise --- each per-domain direction is fit on roughly a
+quarter of the data --- which is itself an argument for pooling. Two
+patterns deserve note: absolute effects are modest at this coefficient, and
+the violence domain is behaviorally immovable (baseline refusal 0.95,
+unchanged under every direction), suggesting refusal of violent requests is
+enforced more redundantly than a single rank-one intervention can undo.
+
+\subsection{RLHF Does Not Amplify Fragmentation}
 \label{sec:results-rlhf}
 
-% Base vs. Instruct comparison figure
+Our third hypothesis predicted that alignment would increase dispersion. The
+opposite holds, weakly: the Instruct checkpoint is slightly \emph{more}
+universal than Base, with a mean per-layer gain in
+$\overline{\cosim}_\ell$ of $+0.011$ for honesty and $+0.007$ for refusal,
+and the gap widening toward the output (honesty at layer 35: 0.690 Base
+vs.\ 0.769 Instruct). Only 10 of 36 layers move in the predicted direction,
+none substantially. Base--Instruct differences in individual per-domain
+cosines grow with depth (up to 0.20), the expected signature of a fine-tune,
+confirming that the two checkpoints genuinely diverge --- alignment simply
+does not diverge them along the axis we hypothesized. If anything,
+preference tuning appears to \emph{consolidate} concept representations.
 
-\subsection{Activation Geometry}
-\label{sec:results-geometry}
+\subsection{A Cautionary Non-Replication}
+\label{sec:results-pilot}
 
-% PCA/UMAP figure — most important figure in the paper
+Our pilot on Gemma~2~2B, run on the response-based refusal data, showed what
+looked like strong fragmentation: a minimum mean cosine of 0.559 and
+near-orthogonal domain pairs. None of this survives on Qwen~2.5~3B --- the
+same data recipe yields cosines of 0.85 and above (\S\ref{sec:results-refusal}).
+We initially suspected dataset artifacts (mixed sources, templated
+responses), but the prompt-based and response-based conditions agree on
+Qwen, ruling that explanation out. The fragmentation was a property of the
+smaller model, not of the data. We report this as a caution for the
+literature: single-model fragmentation findings, including ours on Gemma,
+should not be read as facts about concept directions in general.
 
 
 % ============================================================
