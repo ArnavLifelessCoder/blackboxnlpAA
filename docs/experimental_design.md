@@ -104,7 +104,7 @@ extra extraction.
 |---|---|---|---|
 | **E1 (primary)** | Honesty directions fragment across domains | TruthfulQA (single source, real) | **Partially supported** — early-mid layers (0.522 @ L5), partial late convergence |
 | **E2** | Refusal directions fragment | **prompt-based** (harmful vs harmless) | **Not supported** — universal (0.83–0.94) |
-| **E2′ (robustness)** | Same, response-based | `refusal_new/` diversified | **Not supported** — also universal on Qwen (0.85–0.92); Gemma pilot fragmentation did not replicate |
+| **E2′ (robustness)** | Same, response-based | `refusal_new/` diversified | **Not supported** — also universal on Qwen (0.85–0.93); Gemma pilot fragmentation did not replicate |
 | **E3** | RLHF amplifies fragmentation | E1/E2 on Base vs Instruct | **Not supported** — slight consolidation (Δcos +0.01) |
 | **E4 (behavioral)** | Global steering < per-domain steering | held-out prompts | **Not supported** — global ≥ own-domain everywhere |
 

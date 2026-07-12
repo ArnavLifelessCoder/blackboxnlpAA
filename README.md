@@ -12,7 +12,7 @@ We stress-test the claims of Zou et al. (2023) by computing per-domain vs. globa
 
 ## Key Hypotheses (pre-registered) & Outcomes
 
-1. **Domain Fragmentation:** Per-domain concept directions will diverge significantly from the global direction. → **Partially supported**: honesty fragments in early-mid layers (min mean cos 0.52 @ L5, math near-orthogonal to other domains); refusal is universal under *both* operationalizations (prompt-based cos 0.83–0.94; response-based 0.85–0.92).
+1. **Domain Fragmentation:** Per-domain concept directions will diverge significantly from the global direction. → **Partially supported**: honesty fragments in early-mid layers (min mean cos 0.52 @ L5, math near-orthogonal to other domains); refusal is universal under *both* operationalizations (prompt-based cos 0.83–0.94; response-based 0.85–0.93).
 2. **Transfer Failure:** Steering with a global direction will underperform domain-specific steering. → **Not supported**: global steering matches or beats own-domain steering in every refusal domain (E4, held-out prompts, chat-template protocol).
 3. **RLHF Amplification:** Base→Instruct will *increase* angular dispersion. → **Not supported**: Instruct is slightly *more* universal than Base (Δcos +0.01, consolidating in late layers).
 

@@ -11,7 +11,7 @@
 |---|---|---|
 | **E1** | Honesty directions fragment across domains | **Partially supported** — fragments early-mid layers (min cos 0.522 @ L5, ~57°), partial late convergence (late-third mean 0.69/0.67) |
 | **E2** | Refusal directions fragment (prompt-based) | **Not supported** — universal (cos 0.83–0.94; late-third 0.93/0.91) |
-| **E2′** | Refusal fragments (response-based, robustness) | **Not supported** — also universal on Qwen (0.85–0.92, late 0.904; CI at min layer [0.79, 0.89]) |
+| **E2′** | Refusal fragments (response-based, robustness) | **Not supported** — also universal on Qwen (0.85–0.93, late 0.904; CI at min layer [0.79, 0.89]) |
 | **E3** | RLHF (Base→Instruct) amplifies fragmentation | **Not supported** — slight consolidation (Δcos +0.011 honesty / +0.007 refusal; only 10/36 layers negative, weakly) |
 | **E4** | Global steering < per-domain steering (behavioral) | **Not supported** — global ≥ own-domain in every refusal domain |
 
@@ -19,7 +19,7 @@
 
 - Min mean cos-to-global **0.522 @ layer 5** (~57° mean angle), Instruct and Base alike.
 - Late-third mean cos: **0.694** (Instruct) / **0.667** (Base) — partial convergence.
-- Cross-domain transfer at L5: **math near-orthogonal to all** (−0.10…−0.02);
+- Cross-domain transfer at L5: **math near-orthogonal to all** (−0.10…−0.03);
   best pair factual_trivia↔personal_advice 0.34.
 - Caveat: early-layer minima may reflect surface/token statistics (noted in
   reports); math domain n=59 (< 120 cap) — balance sensitivity outstanding.
@@ -28,7 +28,7 @@
 
 | | Prompt-based (E2) | Response-based (E2′) |
 |---|---|---|
-| Mean cos range across layers | 0.83–0.94 | 0.85–0.92 |
+| Mean cos range across layers | 0.83–0.94 | 0.85–0.93 |
 | Late-third mean cos | 0.928 (Instr) / 0.911 (Base) | 0.904 (Instr) |
 | Pair-level CI at min layer | — | [0.791, 0.885] |
 
