@@ -4,6 +4,11 @@ All commands run from the project root. Labels:
 **[CPU]** runs on your laptop · **[GPU/KAGGLE]** needs a GPU session ·
 **[LOCAL]** git/latex on your machine.
 
+> **Status 2026-07-12: all extraction/analysis/steering runs are DONE** —
+> canonical outputs in `new_results_final/`, numbers in
+> [`docs/results_summary.md`](results_summary.md). The GPU sections below are
+> kept for reproduction. Fresh runs write to `results/` (auto-created).
+
 ---
 
 ## Setup — [LOCAL, CPU] (run once)
@@ -114,6 +119,10 @@ python -m src.analysis.run_steering --model qwen-2.5-3b-instruct --concept refus
 python -m src.analysis.run_steering --model qwen-2.5-3b-instruct --concept refusal \
     --layer 18 --coeff 4.0 --skip-first 120 --n-heldout 20 --cross-domain
 ```
+
+Output filename embeds the coefficient (`steering_*_layer018_coeff4.json`) so
+sweep runs don't overwrite each other. **Prompt-based data must be rebuilt on a
+fresh clone first** (gitignored): `python scripts/build_refusal_promptbased.py --max-per-domain 120`.
 
 The full final GPU session (analysis rerun + E4 + E2′) is scripted in
 `notebooks/03_final_session_kaggle.py`; remaining work in `docs/whats_left.md`.
