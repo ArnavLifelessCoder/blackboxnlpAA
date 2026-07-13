@@ -45,31 +45,33 @@ See `results_summary.md` for every number the paper needs.
 - [ ] Page limit check (8 + refs), figures ≥300 DPI colorblind-safe
 - [ ] OpenReview submission — both approve first
 
-## Reviewer hardening (built 2026-07-12) — run via [`docs/kaggle_runbook.md`](kaggle_runbook.md)
+## Reviewer hardening — DONE (Jul 13, results in `results_cheapwins/`)
 
-Step-by-step instructions for whoever runs the Kaggle session are in the
-runbook (self-contained, no other context needed). Equivalent notebook:
-`notebooks/04_cheap_wins_kaggle.py`.
+All four analyses ran. Outcomes (canonical numbers in `results_summary.md`):
 
-Mock review flagged four weaknesses; all four analyses are now coded and
-tested (56 tests). Priority: 1 > 2 > 3 > 4; items 1–2 are CPU-only.
+- ✅ **1. Probe transfer (E5)** — the big win. Honesty probes fail to transfer
+  across domains (cross 0.56–0.63 vs within 0.73–0.83); refusal probes
+  transfer near-perfectly (0.88–0.98). Fragmentation is **functional, not
+  lexical** — §5.2 keeps "honesty fragments" and gets stronger. New table +
+  paragraph for the paper.
+- ✅ **2. n=59 balanced honesty** — fragmentation persists (min cos 0.536 @ L4).
+  Math-orthogonality is not a small-sample artifact. One sentence in §5.2.
+- ✅ **3. fp16 check** — cross-precision cos ≥0.977, dispersion Δ ≤0.004.
+  Quantization is a measured non-issue; moves from Limitations to a checked
+  robustness sentence.
+- ⚠️ **4. Judged steering** — did NOT cleanly validate. The judge under-counts
+  refusals (labels "can't help with X but can with Y" as compliance), scoring
+  obvious-refusal baselines at 0.10–0.35; keyword scorer is more accurate.
+  BUT the global≥own ordering holds under both scorers → use as a
+  scorer-robustness sentence in §5.3, keyword rates stay primary.
 
-- [ ] **1. Probe transfer matrix** (`src/analysis/probe_transfer.py`) — trains
-  a linear probe per honesty domain, tests cross-domain; gives honesty a
-  functional evidence pillar. ⚠️ Result cuts either way: high transfer means
-  the cosine fragmentation is superficial/lexical — the paper text follows
-  the data.
-- [ ] **2. n=59 balanced honesty rerun** — `run_pipeline --balance-domains`
-  (already built Jul 7), defends the math-orthogonality number.
-- [ ] **3. fp16 spot-check** — `batch_extract --no-quantization` (layers 5,
-  18) + `scripts/compare_quantization.py`; turns the T5 limitation into a
-  measured non-issue (~1h GPU).
-- [ ] **4. Steering rerun + LLM judge** — `run_steering` now persists all
-  generations to a `*_generations.jsonl` sidecar (the Jul 12 run kept only 3
-  truncated examples, so judging required a rerun); `scripts/judge_steering.py`
-  re-scores them with the study model as judge (~4h GPU).
-- [ ] Integrate results into the paper (probe matrix table in §5.2, one
-  sentence each for items 2–4).
+## Remaining before submission (Jul 13 → 17)
+
+- [ ] Integrate the four into `paper/main.tex`: probe-transfer table +
+  paragraph (§5.2), balanced sentence (§5.2), fp16 sentence (§5.2/Limitations),
+  judge robustness sentence (§5.3). Update Limitations.
+- [ ] Recompile on Overleaf; check page count (probe table adds ~0.3 pg).
+- [ ] Both authors read end-to-end; submit by Jul 17.
 
 ## Admin still open
 - [ ] Sign off `docs/operational_definitions.md` (both members)

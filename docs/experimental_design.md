@@ -106,7 +106,8 @@ extra extraction.
 | **E2** | Refusal directions fragment | **prompt-based** (harmful vs harmless) | **Not supported** — universal (0.83–0.94) |
 | **E2′ (robustness)** | Same, response-based | `refusal_new/` diversified | **Not supported** — also universal on Qwen (0.85–0.93); Gemma pilot fragmentation did not replicate |
 | **E3** | RLHF amplifies fragmentation | E1/E2 on Base vs Instruct | **Not supported** — slight consolidation (Δcos +0.01) |
-| **E4 (behavioral)** | Global steering < per-domain steering | held-out prompts | **Not supported** — global ≥ own-domain everywhere |
+| **E4 (behavioral)** | Global steering < per-domain steering | held-out prompts | **Not supported** — global ≥ own-domain everywhere (robust to keyword vs judge scorer) |
+| **E5 (functional)** | Honesty fragmentation is functional, not lexical | cross-domain linear-probe transfer | **Supported** — honesty probes don't transfer (cross 0.56–0.63); refusal probes do (0.88–0.98) |
 
 **Honest framing for the paper:** "We reproduce and stress-test the universality
 of representation-engineering concept directions on a controlled, single-source

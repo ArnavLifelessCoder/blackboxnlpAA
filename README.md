@@ -12,11 +12,11 @@ We stress-test the claims of Zou et al. (2023) by computing per-domain vs. globa
 
 ## Key Hypotheses (pre-registered) & Outcomes
 
-1. **Domain Fragmentation:** Per-domain concept directions will diverge significantly from the global direction. → **Partially supported**: honesty fragments in early-mid layers (min mean cos 0.52 @ L5, math near-orthogonal to other domains); refusal is universal under *both* operationalizations (prompt-based cos 0.83–0.94; response-based 0.85–0.93).
-2. **Transfer Failure:** Steering with a global direction will underperform domain-specific steering. → **Not supported**: global steering matches or beats own-domain steering in every refusal domain (E4, held-out prompts, chat-template protocol).
+1. **Domain Fragmentation:** Per-domain concept directions will diverge significantly from the global direction. → **Partially supported**: honesty fragments in early-mid layers (min mean cos 0.52 @ L5, math near-orthogonal to other domains) and the fragmentation is *functional* — honesty probes fail to transfer across domains (cross-domain accuracy 0.56–0.63 vs 0.73–0.83 within). Refusal is universal under *both* operationalizations (prompt-based cos 0.83–0.94; response-based 0.85–0.93), with probes transferring near-perfectly (up to 0.98).
+2. **Transfer Failure:** Steering with a global direction will underperform domain-specific steering. → **Not supported**: global steering matches or beats own-domain steering in every refusal domain (E4, held-out prompts, chat-template protocol; robust to keyword vs LLM-judge scoring).
 3. **RLHF Amplification:** Base→Instruct will *increase* angular dispersion. → **Not supported**: Instruct is slightly *more* universal than Base (Δcos +0.01, consolidating in late layers).
 
-Additional observation: the Gemma 2 2B pilot's refusal fragmentation (cos 0.56) did **not** replicate on Qwen with the same data recipe — model-specific, an open scale/family question.
+Additional observations: the Gemma 2 2B pilot's refusal fragmentation (cos 0.56) did **not** replicate on Qwen with the same data recipe (model-specific, an open scale/family question); and a 4-bit-vs-fp16 check shows quantization does not distort the measured geometry (cross-precision cosine ≥0.977).
 
 **All numbers:** [docs/results_summary.md](docs/results_summary.md) · raw reports in `new_results_final/` · remaining work: [docs/whats_left.md](docs/whats_left.md)
 
