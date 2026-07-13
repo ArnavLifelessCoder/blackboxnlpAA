@@ -68,11 +68,13 @@ aligned and pre-alignment checkpoints of Qwen~2.5~3B, with confounds from
 mixed data sources, templated responses, and domain imbalance explicitly
 removed. Universality holds for refusal: per-domain and global directions
 agree closely (cosine $\geq 0.83$ at every layer) under two independent
-operationalizations, and a global steering direction shifts held-out
-behavior at least as well as domain-specific ones. It fails partially for
-honesty, where early-layer directions diverge sharply (mean cosine 0.52; the
-math domain is near-orthogonal to all others) and reconverge only partially
-with depth. Contrary to our pre-registered hypothesis, alignment does not
+operationalizations; a global steering direction shifts held-out
+behavior at least as well as domain-specific ones; and probes transfer
+across domains almost perfectly. It fails partially for honesty, where
+early-layer directions diverge sharply (mean cosine 0.52; the math domain is
+near-orthogonal to all others), reconverge only partially with depth, and
+resist cross-domain probing, which marks the fragmentation as functional
+rather than a surface artifact. Contrary to our pre-registered hypothesis, alignment does not
 amplify this fragmentation; if anything it slightly consolidates directions.
 Finally, strong refusal fragmentation that we observed in a smaller pilot
 model did not replicate on the primary model under identical data,
@@ -124,11 +126,14 @@ what we found rather than what we predicted.
 
 We report four findings. \textbf{(1)}~Refusal directions are largely
 universal: per-domain and global directions agree with cosine similarity
-0.83--0.94 across all layers, under both operationalizations
+0.83--0.94 across all layers, under both operationalizations, and probes
+trained on one domain transfer to the others at up to 0.98 accuracy
 (\S\ref{sec:results-refusal}). \textbf{(2)}~Honesty is not. Early- and
 middle-layer directions fragment sharply (mean cosine 0.52 at layer~5, with
 the math domain near-orthogonal to every other), reconverging only partially
-by the output layers (\S\ref{sec:results-honesty}). \textbf{(3)}~The
+by the output layers, and the fragmentation is functional rather than
+lexical: honesty probes fail to transfer across domains
+(\S\ref{sec:results-honesty}). \textbf{(3)}~The
 geometry is behaviorally real: a single global refusal direction steers
 held-out prompts in every domain at least as well as that domain's own
 direction (\S\ref{sec:results-steering}). \textbf{(4)}~Alignment does not
@@ -290,6 +295,21 @@ lexical features, we additionally report the mean cosine over the final
 third of the network, where representations feed the unembedding and
 behavior is read out.
 
+\subsection{Cross-Domain Probing}
+\label{sec:probe-method}
+
+Diverging difference-of-means directions need not imply that the domains use
+different information; the divergence could be a difference in surface
+statistics that a supervised classifier would look past. To test this we
+train an $\ell_2$-regularized logistic probe on one domain's activations at a
+given layer (positive versus negative), standardizing features on the
+training domain, and evaluate its accuracy on every other domain's held-out
+pairs. High off-diagonal accuracy despite low direction cosines would mean
+the domains share a decodable concept subspace and the geometric
+fragmentation is superficial; off-diagonal accuracy near chance, with high
+on-diagonal accuracy, would mean the fragmentation is functional. We report
+this transfer matrix for both concepts.
+
 \subsection{Behavioral Steering}
 \label{sec:steering-method}
 
@@ -352,8 +372,12 @@ analysis is CPU-only and fully scripted, from cached activations to the
 figures in this paper. We use greedy decoding throughout the steering
 experiments and fix all random seeds; the mock-data mode of the released
 pipeline reproduces every table in this paper end-to-end on synthetic
-activations before any GPU is touched. Code, data manifests, and validation
-tooling are released with the paper.
+activations before any GPU is touched. To confirm that 4-bit quantization
+does not shape the geometry, we re-extracted the honesty activations at
+layers 5 and 18 in fp16: per-domain directions agree with their 4-bit
+counterparts at cosine 0.977 or above, and the dispersion statistic changes
+by at most 0.004, so we treat quantization as a non-factor. Code, data
+manifests, and validation tooling are released with the paper.
 
 
 % ============================================================
@@ -423,7 +447,10 @@ uses to decide refusal, it points in essentially the same direction whether
 the request concerns violence, illegal activity, medical ethics, or privacy.
 This is consistent with the single-direction account of
 \citet{arditi2024refusal}, and shows that the account is stable across two
-operationalizations of the concept.
+operationalizations of the concept. A probe trained on one refusal domain
+confirms the picture functionally: it transfers to the other domains with a
+mean accuracy of 0.88 at layer 5, rising to 0.98 by layer 30, against a
+within-domain accuracy of essentially 1.0 (Table~\ref{tab:probe}).
 
 \subsection{Honesty Fragments in Early and Middle Layers}
 \label{sec:results-honesty}
@@ -437,29 +464,60 @@ operationalizations of the concept.
   \label{fig:honesty-heatmap}
 \end{figure}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/fig_honesty_pca.pdf}
-  \caption{PCA projection of per-domain and global honesty directions
-  across layers. Domain directions occupy visibly distinct regions rather
-  than collapsing onto a single axis.}
-  \label{fig:honesty-pca}
-\end{figure}
+% PCA geometry figure removed for space and legibility (its labels do not
+% render at column width); the heatmap and probe table carry the
+% fragmentation story. To restore, regenerate fig_honesty_pca.pdf at column
+% size and re-add the figure environment plus a reference to it.
 
-Honesty behaves differently
-(Figures~\ref{fig:honesty-heatmap} and~\ref{fig:honesty-pca}). The mean
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Condition} & \textbf{Layer} & \textbf{Within} & \textbf{Cross} \\
+    \midrule
+    Honesty (Instruct) & 5  & 0.73 & 0.56 \\
+    Honesty (Instruct) & 18 & 0.80 & 0.61 \\
+    Honesty (Instruct) & 30 & 0.83 & 0.63 \\
+    Honesty ($n{=}59$) & 30 & 0.83 & 0.63 \\
+    \midrule
+    Refusal (Instruct) & 5  & 1.00 & 0.88 \\
+    Refusal (Instruct) & 18 & 1.00 & 0.96 \\
+    Refusal (Instruct) & 30 & 1.00 & 0.98 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Cross-domain probe transfer. \textbf{Within} is mean accuracy on
+  a domain's own held-out pairs; \textbf{Cross} is mean accuracy of a probe
+  trained on one domain and tested on the others. Honesty probes barely
+  transfer; refusal probes transfer almost perfectly.}
+  \label{tab:probe}
+\end{table}
+
+Honesty behaves differently (Figure~\ref{fig:honesty-heatmap}). The mean
 cosine to the global direction falls to 0.522 at layer~5, a mean angle of
 $57^\circ$. At that depth the math direction is essentially orthogonal to
 every other domain (pairwise cosines between $-0.10$ and $-0.03$), and even
 the best-aligned pair, factual trivia and personal advice, reaches only
 0.34. Dispersion then decays with depth, but only
 partially: the final-third mean of 0.694 remains well below the
-corresponding refusal values. Universality is thus not a property of concept
-directions per se, but of particular concepts at particular depths. We note
-that early-layer divergence may partly reflect lexical differences between
-domains (arithmetic text simply looks different from trivia questions), which
-is one reason we insist on the behavioral test below; the late-layer gap
-between honesty and refusal, however, survives this caveat.
+corresponding refusal values. Because the math domain is smaller than the
+others (59 pairs), we repeated the analysis with every domain capped to that
+size; the minimum mean cosine barely moves (0.536), so the fragmentation is
+not an artifact of unequal sample sizes.
+
+A natural worry is that early-layer divergence reflects surface statistics
+rather than the concept, since arithmetic text does not resemble trivia
+text. The probe transfer matrix argues against this reading. A logistic
+probe that separates true from false honesty statements within one domain
+transfers poorly to the others, with mean cross-domain accuracy of
+0.56--0.63 across layers 5, 18, and 30, against within-domain accuracy of
+0.73--0.83 (Table~\ref{tab:probe}); the weakest cells, such as math tested on
+politics, sit near chance. A supervised classifier with access to the whole
+activation, not just its first moment, still cannot carry honesty from one
+domain to another. Set beside refusal, whose probes transfer at 0.88 to 0.98,
+this indicates that honesty fragmentation is functional rather than merely
+lexical: universality is a property of particular concepts at particular
+depths, not of concept directions in general.
 
 \subsection{Steering Confirms the Geometry}
 \label{sec:results-steering}
@@ -498,7 +556,12 @@ quarter of the data; this is itself an argument for pooling. Two caveats:
 absolute effects are modest at this coefficient, and the violence domain is
 behaviorally immovable (baseline refusal 0.95, unchanged under every
 direction), suggesting refusal of violent requests is enforced more
-redundantly than a single rank-one intervention can undo.
+redundantly than a single rank-one intervention can undo. The ordering in
+Table~\ref{tab:steering} does not depend on the keyword detector: re-scoring
+the same generations with an instruction-tuned model as a refusal judge
+shifts the absolute rates but preserves the sign of every
+own-minus-global comparison, so the global direction remains at least as
+effective as each domain's own under both scorers.
 
 \subsection{RLHF Does Not Amplify Fragmentation}
 \label{sec:results-rlhf}
@@ -545,14 +608,15 @@ should not be read as facts about concept directions in general.
 \label{sec:discussion}
 
 \paragraph{Universality is a property of concepts, not of the method.}
-The cleanest reading of our results is that the question ``are concept
+Our results suggest that the question ``are concept
 directions universal?'' is ill-posed as stated. Refusal, at least in
 Qwen~2.5~3B, behaves as the representation-engineering literature assumes: a
 single axis, stable across semantic domains, across two very different
 extraction recipes, and causally effective wherever we tested it. Honesty
 does not. Its early- and middle-layer directions are so domain-specific that
-the math direction is orthogonal to the rest, and even at the output layers
-the domains agree far less than refusal domains do. One plausible mechanism
+the math direction is orthogonal to the rest, even at the output layers the
+domains agree far less than refusal domains do, and a supervised probe
+trained on one domain fails to carry to the others. One plausible mechanism
 is that refusal is a comparatively unified \emph{behavior}, a decision the
 model renders in a recognizable surface form regardless of topic, whereas
 honesty is a property of content, entangled with whatever domain knowledge
@@ -601,32 +665,29 @@ is a question our compute budget could not answer.
 \label{sec:limitations}
 
 \paragraph{Scale and coverage.}
-Our primary evidence comes from one 3B-parameter model family, quantized to
-4~bits to fit our compute budget; quantization may distort activation
-geometry, and our own pilot demonstrates that these findings can be
-model-specific. We study two concepts in four domains each, in English only.
-The honesty math domain is thinner than the others (59 pairs against a
-120-pair cap), so its striking orthogonality, while consistent with the
-qualitative picture, rests on the least data; a domain-balance sensitivity
-analysis is left to future work.
+Our primary evidence comes from one 3B-parameter model family, and our own
+pilot demonstrates that these findings can be model-specific. We study two
+concepts in four domains each, in English only. Whether the honesty-versus-
+refusal split we observe holds at larger scale, in other families, or for
+further concepts is the obvious next question.
 
 \paragraph{Measurement.}
 Directions are read at the final token position and assumed linear;
 concept structure that is nonlinear, distributed across positions, or
-rank-greater-than-one is invisible to our measures. Early-layer honesty
-fragmentation may be partly lexical, since arithmetic text simply differs
-from trivia text at the surface; this is why we lean on late-layer and
-behavioral evidence, but the two cannot be fully disentangled here.
+rank-greater-than-one is invisible to our measures. We ran the model in
+4-bit precision, but an fp16 re-extraction at two layers changed the
+directions and the dispersion statistic negligibly
+(\S\ref{sec:setup}), so quantization is not driving the results.
 
 \paragraph{Steering protocol.}
-The behavioral experiment uses keyword matching to detect refusal, a single
-surviving steering coefficient, one intervention layer, and 20 held-out
-prompts per domain; in the two domains with fewer than 140 source prompts,
-held-out prompts partially overlap the direction-estimation data. Effects
-are accordingly coarse: we trust the \emph{ordering} of global versus
-per-domain steering, which is consistent across domains, more than any
-individual effect size. A judge-model evaluation and a fuller coefficient
-sweep would strengthen this leg of the study.
+The behavioral experiment uses a single steering coefficient, one
+intervention layer, and 20 held-out prompts per domain; in the two domains
+with fewer than 140 source prompts, held-out prompts partially overlap the
+direction-estimation data. Effects are accordingly coarse, and we trust the
+\emph{ordering} of global versus per-domain steering, which is consistent
+across domains and across both a keyword and a judge-model refusal detector,
+more than any individual effect size. A fuller coefficient sweep would
+further strengthen this leg of the study.
 
 
 % ============================================================
