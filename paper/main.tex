@@ -757,6 +757,7 @@ is a shared pool across domains.
   painkillers for minor, manageable pain?''
 \end{itemize}
 
+\clearpage
 \section{Full Layer-wise Results}
 \label{app:layers}
 
@@ -765,8 +766,11 @@ between per-domain and global directions at every layer of Qwen~2.5~3B, for
 all five conditions reported in the paper. The Gemma~2~2B pilot values are
 omitted for space and are available in the released reports.
 
-\begin{table}[t]
-  \centering
+% Non-floating so the two halves stay in reading order and fill column 1
+% then column 2 of this page. \newpage in two-column mode breaks to the next
+% column, so the second half starts at the top of column 2.
+\par\medskip
+{\centering
   \small
   \setlength{\tabcolsep}{4pt}
   \begin{tabular}{rccccc}
@@ -795,15 +799,16 @@ omitted for space and are available in the released reports.
     17 & 0.906 & 0.904 & 0.923 & 0.584 & 0.583 \\
     \bottomrule
   \end{tabular}
-  \caption{Mean cosine between per-domain and global directions, layers
-  0--17 (Qwen~2.5~3B); continued in Table~\ref{tab:layerwise-b}.
+  \captionof{table}{Mean cosine between per-domain and global directions,
+  layers 0--17 (Qwen~2.5~3B); continued in Table~\ref{tab:layerwise-b}.
   ``prompt''/``resp.'' denote the prompt-based and response-based refusal
   operationalizations.}
   \label{tab:layerwise}
-\end{table}
+  \par}
 
-\begin{table}[t]
-  \centering
+\newpage
+
+{\centering
   \small
   \setlength{\tabcolsep}{4pt}
   \begin{tabular}{rccccc}
@@ -832,9 +837,9 @@ omitted for space and are available in the released reports.
     35 & 0.920 & 0.900 & 0.887 & 0.769 & 0.690 \\
     \bottomrule
   \end{tabular}
-  \caption{Layer-wise mean cosine, layers 18--35 (continued from
+  \captionof{table}{Layer-wise mean cosine, layers 18--35 (continued from
   Table~\ref{tab:layerwise}).}
   \label{tab:layerwise-b}
-\end{table}
+  \par}
 
 \end{document}
