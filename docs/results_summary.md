@@ -14,7 +14,7 @@
 | **E2** | Refusal directions fragment (prompt-based) | **Not supported** — universal (cos 0.83–0.94; late-third 0.93/0.91) |
 | **E2′** | Refusal fragments (response-based, robustness) | **Not supported** — also universal on Qwen (0.85–0.93, late 0.904; CI at min layer [0.79, 0.89]) |
 | **E3** | RLHF (Base→Instruct) amplifies fragmentation | **Not supported** — slight consolidation (Δcos +0.011 honesty / +0.007 refusal; only 10/36 layers negative, weakly) |
-| **E4** | Global steering < per-domain steering (behavioral) | **Not supported** — global ≥ own-domain in every refusal domain (robust to keyword vs judge scorer) |
+| **E4** | Global steering < per-domain steering (behavioral) | **Not supported** — no systematic per-domain advantage; global matches per-domain, differences at the 1-prompt (n=20) noise floor across two runs and two scorers |
 | **E5** | Honesty fragmentation is functional (probe transfer) | **Supported** — honesty probes fail to transfer across domains (cross-domain acc 0.56–0.63 vs within 0.73–0.83); refusal probes transfer near-perfectly (0.88→0.98). Fragmentation is functional, not merely lexical. |
 
 ## E1 — Honesty (clean primary; TruthfulQA single-source)
@@ -85,15 +85,17 @@ illegal_activity/violence directions). Violence is behaviorally immovable at
 this coefficient. Only coeff 4.0 survives (2.0 run was overwritten before the
 filename fix).
 
-**Scorer robustness (judge vs keyword).** An LLM-judge re-score of the same
-generations gives very different *absolute* rates (it under-counts refusals:
-it labels "I can't help with X, but I can help with Y" as compliance, so
-even the obvious refusal baselines score 0.10–0.35 vs the keyword scorer's
-0.50–0.95 — inspection of the raw generations confirms the baselines are
-genuine refusals, so the keyword scorer is the more accurate one here). The
-**ordering is robust**, though: under the judge too, own − global ≥ 0 in all
-four domains. Report as "the conclusion (global ≥ per-domain) holds under
-both a keyword and an LLM-judge scorer," and keep keyword rates as primary.
+**Run/scorer robustness — the honest picture.** The strict claim "global ≥
+own in every domain" holds in the Jul 12 run but NOT in the Jul 13
+replication (illegal_activity: own −0.10 beats global −0.05, i.e. one prompt).
+The judge re-score also under-counts refusals (labels "can't help with X but
+can with Y" as compliance; baselines score 0.10–0.35 vs keyword 0.50–0.95 —
+raw generations confirm the baselines are genuine refusals, so keyword is the
+more accurate scorer). Across all three (Jul12-kw, Jul13-kw, Jul13-judge) the
+worst per-domain edge for the own-direction is one prompt (0.05).
+**Defensible claim: no systematic per-domain steering advantage; differences
+are at the n=20 noise floor.** Do NOT claim strict "global ≥ own everywhere"
+or "sign preserved across scorers" — the artifacts contradict both.
 
 ## Gemma 2B pilot — did NOT replicate on Qwen
 

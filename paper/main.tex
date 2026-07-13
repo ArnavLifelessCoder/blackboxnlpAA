@@ -69,7 +69,7 @@ mixed data sources, templated responses, and domain imbalance explicitly
 removed. Universality holds for refusal: per-domain and global directions
 agree closely (cosine $\geq 0.83$ at every layer) under two independent
 operationalizations; a global steering direction shifts held-out
-behavior at least as well as domain-specific ones; and probes transfer
+behavior as effectively as domain-specific ones; and probes transfer
 across domains almost perfectly. It fails partially for honesty, where
 early-layer directions diverge sharply (mean cosine 0.52; the math domain is
 near-orthogonal to all others), reconverge only partially with depth, and
@@ -135,8 +135,8 @@ by the output layers, and the fragmentation is functional rather than
 lexical: honesty probes fail to transfer across domains
 (\S\ref{sec:results-honesty}). \textbf{(3)}~The
 geometry is behaviorally real: a single global refusal direction steers
-held-out prompts in every domain at least as well as that domain's own
-direction (\S\ref{sec:results-steering}). \textbf{(4)}~Alignment does not
+held-out prompts as effectively as each domain's own direction, with no
+systematic per-domain advantage (\S\ref{sec:results-steering}). \textbf{(4)}~Alignment does not
 fragment concept representations; the Instruct checkpoint is in fact
 marginally \emph{more} universal than its Base (\S\ref{sec:results-rlhf}).
 In addition, fragmentation observed on a smaller pilot model failed to
@@ -375,7 +375,7 @@ pipeline reproduces every table in this paper end-to-end on synthetic
 activations before any GPU is touched. To confirm that 4-bit quantization
 does not shape the geometry, we re-extracted the honesty activations at
 layers 5 and 18 in fp16: per-domain directions agree with their 4-bit
-counterparts at cosine 0.977 or above, and the dispersion statistic changes
+counterparts at cosine above 0.97, and the dispersion statistic changes
 by at most 0.004, so we treat quantization as a non-factor. Code, data
 manifests, and validation tooling are released with the paper.
 
@@ -536,32 +536,29 @@ depths, not of concept directions in general.
     \bottomrule
   \end{tabular}
   \caption{Behavioral steering on held-out harmful prompts (Qwen~2.5~3B
-  Instruct, layer 18, coefficient 4.0, $n{=}20$ per domain). Baseline is the
-  unsteered refusal rate; $\Delta$ columns give the change under steering
-  with the global versus the domain's own direction. The global direction is
-  never worse than the domain-specific one.}
+  Instruct, layer 18, coefficient 4.0, $n{=}20$ per domain, one representative
+  run). Baseline is the unsteered refusal rate; $\Delta$ columns give the
+  change under steering with the global versus the domain's own direction.
+  The global direction is comparable to the domain-specific one throughout.}
   \label{tab:steering}
 \end{table}
 
 The second hypothesis, that global steering underperforms domain-specific
-steering, also fails, and it fails in the direction favorable to
-universality (Table~\ref{tab:steering}). In every domain the global direction shifts
-behavior at least as much as the domain's own direction, and in two domains
-strictly more (medical/legal: $-0.15$ vs.\ $0.00$; privacy: $-0.40$ vs.\
-$-0.15$). Cross-domain directions transfer as well: privacy prompts are
-steered as strongly by the violence and illegal-activity directions
-($-0.40$) as by the global one. We attribute the weaker own-domain effects
-to estimation noise, since each per-domain direction is fit on roughly a
-quarter of the data; this is itself an argument for pooling. Two caveats:
-absolute effects are modest at this coefficient, and the violence domain is
+steering, is not supported (Table~\ref{tab:steering}). In no domain does the
+own-domain direction steer systematically better than the global one; where
+the two differ, they differ by one or two prompts out of twenty, which is the
+resolution limit of this experiment. In the run shown, the global direction
+matches or exceeds the own-domain direction in every domain, and cross-domain
+directions transfer as well (privacy prompts are steered as strongly by the
+violence and illegal-activity directions as by the global one). A replication
+and a re-scoring of the generations with an instruction-tuned model as a
+refusal judge, rather than the keyword detector, move individual cells by a
+prompt or two but leave this picture intact: no per-domain direction shows a
+reliable advantage. We read the whole experiment cautiously, since absolute
+effects are modest at this coefficient and the violence domain is
 behaviorally immovable (baseline refusal 0.95, unchanged under every
-direction), suggesting refusal of violent requests is enforced more
-redundantly than a single rank-one intervention can undo. The ordering in
-Table~\ref{tab:steering} does not depend on the keyword detector: re-scoring
-the same generations with an instruction-tuned model as a refusal judge
-shifts the absolute rates but preserves the sign of every
-own-minus-global comparison, so the global direction remains at least as
-effective as each domain's own under both scorers.
+direction), but the absence of a per-domain steering advantage is what a
+universal refusal direction predicts.
 
 \subsection{RLHF Does Not Amplify Fragmentation}
 \label{sec:results-rlhf}
@@ -626,8 +623,8 @@ being right about arithmetic and being right about geography need not be.
 \paragraph{Implications for steering-based safety.}
 For practitioners the refusal result is reassuring: a guardrail built on a
 single pooled refusal direction is not silently missing domains, and pooling
-across domains is actively preferable, since per-domain directions are
-noisier estimates of the same axis (\S\ref{sec:results-steering}). The
+across domains costs nothing in steering effectiveness while drawing on more
+data per direction (\S\ref{sec:results-steering}). The
 honesty result carries the opposite warning. Interventions aimed at
 truthfulness that are calibrated on one distribution (in practice, usually
 trivia-style benchmarks) have no guarantee of engaging the
