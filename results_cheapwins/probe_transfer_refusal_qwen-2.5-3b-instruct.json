@@ -1,0 +1,263 @@
+{
+  "generated_at": "2026-07-13T03:56:21",
+  "model": "qwen-2.5-3b-instruct",
+  "concept": "refusal",
+  "domains": [
+    "illegal_activity",
+    "medical_legal",
+    "privacy",
+    "violence"
+  ],
+  "layers": [
+    5,
+    18,
+    30
+  ],
+  "test_frac": 0.25,
+  "seed": 42,
+  "balance_to": null,
+  "matrix": {
+    "5": {
+      "illegal_activity": {
+        "illegal_activity": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 0.6607142857142857,
+          "auc": 0.9987244897959184
+        },
+        "violence": {
+          "acc": 1.0,
+          "auc": 1.0
+        }
+      },
+      "medical_legal": {
+        "illegal_activity": {
+          "acc": 0.85,
+          "auc": 0.9922222222222222
+        },
+        "medical_legal": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 0.7142857142857143,
+          "auc": 0.9846938775510204
+        },
+        "violence": {
+          "acc": 0.8260869565217391,
+          "auc": 1.0
+        }
+      },
+      "privacy": {
+        "illegal_activity": {
+          "acc": 0.9666666666666667,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "violence": {
+          "acc": 0.9347826086956522,
+          "auc": 1.0
+        }
+      },
+      "violence": {
+        "illegal_activity": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 0.6071428571428571,
+          "auc": 0.9540816326530612
+        },
+        "violence": {
+          "acc": 1.0,
+          "auc": 1.0
+        }
+      }
+    },
+    "18": {
+      "illegal_activity": {
+        "illegal_activity": {
+          "acc": 0.9833333333333333,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 0.9833333333333333,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 0.8214285714285714,
+          "auc": 1.0
+        },
+        "violence": {
+          "acc": 1.0,
+          "auc": 1.0
+        }
+      },
+      "medical_legal": {
+        "illegal_activity": {
+          "acc": 0.9833333333333333,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 0.9107142857142857,
+          "auc": 1.0
+        },
+        "violence": {
+          "acc": 1.0,
+          "auc": 1.0
+        }
+      },
+      "privacy": {
+        "illegal_activity": {
+          "acc": 0.9833333333333333,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "violence": {
+          "acc": 1.0,
+          "auc": 1.0
+        }
+      },
+      "violence": {
+        "illegal_activity": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 0.9833333333333333,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 0.8214285714285714,
+          "auc": 1.0
+        },
+        "violence": {
+          "acc": 1.0,
+          "auc": 1.0
+        }
+      }
+    },
+    "30": {
+      "illegal_activity": {
+        "illegal_activity": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 0.9333333333333333,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 0.9821428571428571,
+          "auc": 1.0
+        },
+        "violence": {
+          "acc": 1.0,
+          "auc": 1.0
+        }
+      },
+      "medical_legal": {
+        "illegal_activity": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "violence": {
+          "acc": 1.0,
+          "auc": 1.0
+        }
+      },
+      "privacy": {
+        "illegal_activity": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 0.95,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "violence": {
+          "acc": 1.0,
+          "auc": 1.0
+        }
+      },
+      "violence": {
+        "illegal_activity": {
+          "acc": 1.0,
+          "auc": 1.0
+        },
+        "medical_legal": {
+          "acc": 0.95,
+          "auc": 1.0
+        },
+        "privacy": {
+          "acc": 0.9642857142857143,
+          "auc": 1.0
+        },
+        "violence": {
+          "acc": 1.0,
+          "auc": 1.0
+        }
+      }
+    }
+  },
+  "summary": {
+    "5": {
+      "mean_within_acc": 1.0,
+      "mean_cross_acc": 0.8799732574189097,
+      "min_cross_acc": 0.6071428571428571,
+      "transfer_gap": 0.12002674258109025
+    },
+    "18": {
+      "mean_within_acc": 0.9958333333333333,
+      "mean_cross_acc": 0.9572420634920634,
+      "min_cross_acc": 0.8214285714285714,
+      "transfer_gap": 0.038591269841269926
+    },
+    "30": {
+      "mean_within_acc": 1.0,
+      "mean_cross_acc": 0.9816468253968252,
+      "min_cross_acc": 0.9333333333333333,
+      "transfer_gap": 0.01835317460317476
+    }
+  }
+}

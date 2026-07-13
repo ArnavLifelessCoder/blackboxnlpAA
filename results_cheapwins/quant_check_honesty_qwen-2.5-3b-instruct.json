@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-07-13T04:30:52",
+  "model": "qwen-2.5-3b-instruct",
+  "concept": "honesty",
+  "layers": [
+    5,
+    18
+  ],
+  "per_layer": {
+    "5": {
+      "cross_precision_cos": {
+        "factual_trivia": 0.989797055721283,
+        "math": 0.9781453609466553,
+        "politics_opinion": 0.9866317510604858,
+        "personal_advice": 0.9897191524505615,
+        "global": 0.9900076985359192
+      },
+      "mean_cos_to_global_4bit": 0.5216205660253763,
+      "mean_cos_to_global_fp16": 0.5234222710132599,
+      "dispersion_delta": 0.0018017049878835678
+    },
+    "18": {
+      "cross_precision_cos": {
+        "factual_trivia": 0.9891857504844666,
+        "math": 0.9765975475311279,
+        "politics_opinion": 0.985697329044342,
+        "personal_advice": 0.9878017902374268,
+        "global": 0.9897255897521973
+      },
+      "mean_cos_to_global_4bit": 0.5915311593562365,
+      "mean_cos_to_global_fp16": 0.5880057411268353,
+      "dispersion_delta": -0.0035254182294011116
+    }
+  }
+}

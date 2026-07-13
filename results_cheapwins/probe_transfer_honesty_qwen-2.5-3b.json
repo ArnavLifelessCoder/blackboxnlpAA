@@ -1,0 +1,263 @@
+{
+  "generated_at": "2026-07-13T03:56:12",
+  "model": "qwen-2.5-3b",
+  "concept": "honesty",
+  "domains": [
+    "factual_trivia",
+    "math",
+    "personal_advice",
+    "politics_opinion"
+  ],
+  "layers": [
+    5,
+    18,
+    30
+  ],
+  "test_frac": 0.25,
+  "seed": 42,
+  "balance_to": null,
+  "matrix": {
+    "5": {
+      "factual_trivia": {
+        "factual_trivia": {
+          "acc": 0.6,
+          "auc": 0.6788888888888889
+        },
+        "math": {
+          "acc": 0.4666666666666667,
+          "auc": 0.4666666666666667
+        },
+        "personal_advice": {
+          "acc": 0.6333333333333333,
+          "auc": 0.6977777777777778
+        },
+        "politics_opinion": {
+          "acc": 0.6,
+          "auc": 0.7022222222222222
+        }
+      },
+      "math": {
+        "factual_trivia": {
+          "acc": 0.55,
+          "auc": 0.5655555555555556
+        },
+        "math": {
+          "acc": 0.8,
+          "auc": 0.8755555555555555
+        },
+        "personal_advice": {
+          "acc": 0.5166666666666667,
+          "auc": 0.48555555555555563
+        },
+        "politics_opinion": {
+          "acc": 0.4,
+          "auc": 0.3611111111111111
+        }
+      },
+      "personal_advice": {
+        "factual_trivia": {
+          "acc": 0.5333333333333333,
+          "auc": 0.5277777777777778
+        },
+        "math": {
+          "acc": 0.5,
+          "auc": 0.6088888888888888
+        },
+        "personal_advice": {
+          "acc": 0.7333333333333333,
+          "auc": 0.778888888888889
+        },
+        "politics_opinion": {
+          "acc": 0.6166666666666667,
+          "auc": 0.5977777777777779
+        }
+      },
+      "politics_opinion": {
+        "factual_trivia": {
+          "acc": 0.5166666666666667,
+          "auc": 0.538888888888889
+        },
+        "math": {
+          "acc": 0.5,
+          "auc": 0.5288888888888889
+        },
+        "personal_advice": {
+          "acc": 0.6,
+          "auc": 0.6288888888888888
+        },
+        "politics_opinion": {
+          "acc": 0.6166666666666667,
+          "auc": 0.6544444444444445
+        }
+      }
+    },
+    "18": {
+      "factual_trivia": {
+        "factual_trivia": {
+          "acc": 0.7833333333333333,
+          "auc": 0.9011111111111111
+        },
+        "math": {
+          "acc": 0.5,
+          "auc": 0.5955555555555555
+        },
+        "personal_advice": {
+          "acc": 0.7666666666666667,
+          "auc": 0.8022222222222223
+        },
+        "politics_opinion": {
+          "acc": 0.8,
+          "auc": 0.8866666666666667
+        }
+      },
+      "math": {
+        "factual_trivia": {
+          "acc": 0.48333333333333334,
+          "auc": 0.46333333333333326
+        },
+        "math": {
+          "acc": 0.7333333333333333,
+          "auc": 0.9288888888888889
+        },
+        "personal_advice": {
+          "acc": 0.5,
+          "auc": 0.5344444444444444
+        },
+        "politics_opinion": {
+          "acc": 0.4666666666666667,
+          "auc": 0.4588888888888889
+        }
+      },
+      "personal_advice": {
+        "factual_trivia": {
+          "acc": 0.65,
+          "auc": 0.7988888888888889
+        },
+        "math": {
+          "acc": 0.6333333333333333,
+          "auc": 0.5688888888888889
+        },
+        "personal_advice": {
+          "acc": 0.7333333333333333,
+          "auc": 0.8188888888888889
+        },
+        "politics_opinion": {
+          "acc": 0.7833333333333333,
+          "auc": 0.8455555555555556
+        }
+      },
+      "politics_opinion": {
+        "factual_trivia": {
+          "acc": 0.6666666666666666,
+          "auc": 0.7000000000000001
+        },
+        "math": {
+          "acc": 0.5333333333333333,
+          "auc": 0.37333333333333335
+        },
+        "personal_advice": {
+          "acc": 0.6,
+          "auc": 0.688888888888889
+        },
+        "politics_opinion": {
+          "acc": 0.8166666666666667,
+          "auc": 0.8955555555555557
+        }
+      }
+    },
+    "30": {
+      "factual_trivia": {
+        "factual_trivia": {
+          "acc": 0.8333333333333334,
+          "auc": 0.9144444444444444
+        },
+        "math": {
+          "acc": 0.23333333333333334,
+          "auc": 0.29333333333333333
+        },
+        "personal_advice": {
+          "acc": 0.7,
+          "auc": 0.7866666666666667
+        },
+        "politics_opinion": {
+          "acc": 0.75,
+          "auc": 0.8511111111111112
+        }
+      },
+      "math": {
+        "factual_trivia": {
+          "acc": 0.5166666666666667,
+          "auc": 0.4666666666666667
+        },
+        "math": {
+          "acc": 0.8666666666666667,
+          "auc": 0.9511111111111112
+        },
+        "personal_advice": {
+          "acc": 0.48333333333333334,
+          "auc": 0.4722222222222222
+        },
+        "politics_opinion": {
+          "acc": 0.6,
+          "auc": 0.5977777777777777
+        }
+      },
+      "personal_advice": {
+        "factual_trivia": {
+          "acc": 0.8,
+          "auc": 0.8822222222222221
+        },
+        "math": {
+          "acc": 0.4,
+          "auc": 0.3155555555555556
+        },
+        "personal_advice": {
+          "acc": 0.7833333333333333,
+          "auc": 0.8566666666666667
+        },
+        "politics_opinion": {
+          "acc": 0.7666666666666667,
+          "auc": 0.8755555555555555
+        }
+      },
+      "politics_opinion": {
+        "factual_trivia": {
+          "acc": 0.7166666666666667,
+          "auc": 0.82
+        },
+        "math": {
+          "acc": 0.43333333333333335,
+          "auc": 0.29333333333333333
+        },
+        "personal_advice": {
+          "acc": 0.6833333333333333,
+          "auc": 0.7844444444444444
+        },
+        "politics_opinion": {
+          "acc": 0.7833333333333333,
+          "auc": 0.8633333333333334
+        }
+      }
+    }
+  },
+  "summary": {
+    "5": {
+      "mean_within_acc": 0.6875,
+      "mean_cross_acc": 0.5361111111111111,
+      "min_cross_acc": 0.4,
+      "transfer_gap": 0.1513888888888889
+    },
+    "18": {
+      "mean_within_acc": 0.7666666666666666,
+      "mean_cross_acc": 0.6152777777777777,
+      "min_cross_acc": 0.4666666666666667,
+      "transfer_gap": 0.1513888888888889
+    },
+    "30": {
+      "mean_within_acc": 0.8166666666666667,
+      "mean_cross_acc": 0.5902777777777778,
+      "min_cross_acc": 0.23333333333333334,
+      "transfer_gap": 0.22638888888888886
+    }
+  }
+}
