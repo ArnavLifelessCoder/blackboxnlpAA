@@ -304,11 +304,15 @@ statistics that a supervised classifier would look past. To test this we
 train an $\ell_2$-regularized logistic probe on one domain's activations at a
 given layer (positive versus negative), standardizing features on the
 training domain, and evaluate its accuracy on every other domain's held-out
-pairs. High off-diagonal accuracy despite low direction cosines would mean
-the domains share a decodable concept subspace and the geometric
-fragmentation is superficial; off-diagonal accuracy near chance, with high
-on-diagonal accuracy, would mean the fragmentation is functional. We report
-this transfer matrix for both concepts.
+pairs. Within each domain we hold out 25\% of the pairs as the test split;
+the probe is trained on the remaining 75\% with $\ell_2$ regularization
+($C{=}1$) and the same fixed seed used throughout, and positive and negative
+activations for a pair are never split across train and test. High
+off-diagonal accuracy despite low direction cosines would mean the domains
+share a decodable concept subspace and the geometric fragmentation is
+superficial; off-diagonal accuracy near chance, with high on-diagonal
+accuracy, would mean the fragmentation is functional. We report this
+transfer matrix for both concepts.
 
 \subsection{Behavioral Steering}
 \label{sec:steering-method}
@@ -500,9 +504,11 @@ the best-aligned pair, factual trivia and personal advice, reaches only
 0.34. Dispersion then decays with depth, but only
 partially: the final-third mean of 0.694 remains well below the
 corresponding refusal values. Because the math domain is smaller than the
-others (59 pairs), we repeated the analysis with every domain capped to that
-size; the minimum mean cosine barely moves (0.536), so the fragmentation is
-not an artifact of unequal sample sizes.
+others (59 pairs) and its pairs are partly hand-written, we repeated the
+analysis with every domain capped to that size; the minimum mean cosine
+barely moves (0.536), so the fragmentation is not an artifact of unequal
+sample sizes, and the probe test below controls for the possibility that the
+math pairs simply differ in surface form.
 
 A natural worry is that early-layer divergence reflects surface statistics
 rather than the concept, since arithmetic text does not resemble trivia
@@ -692,15 +698,27 @@ further strengthen this leg of the study.
 
 We set out to show that concept directions fragment across semantic domains
 and that alignment makes it worse. Under controls strict enough to trust,
-neither claim survived for refusal, both survived in weakened form for
-honesty, and a dramatic fragmentation result from our own pilot model turned
-out not to generalize. The constructive summary is a scoping rule: a concept direction is universal
+refusal turned out to be universal, not fragmented; honesty fragmented but
+only in part, and mainly in early and middle layers; alignment did not make
+either worse; and a dramatic fragmentation result from our own pilot model
+did not generalize to the primary model. The constructive summary is a scoping rule: a concept direction is universal
 to the extent that the concept is a unified behavior rather than
 domain-entangled content, and that extent has to be measured for each
 concept, depth, and model rather than assumed. The controlled comparison
 that yields such measurements costs little beyond the extraction runs
 practitioners already perform, and we release our pipeline so that reporting
 one becomes the path of least resistance.
+
+\section*{Data and Code Availability}
+
+All prompt-pair data, the extraction and analysis pipeline (difference-of-
+means directions, pair-level bootstrap, cross-domain probing, and the
+steering harness), the hand-written arithmetic pairs, and scripts to
+regenerate every table and figure are released. For anonymous review an
+anonymized copy is available at
+\url{https://anonymous.4open.science/r/concept-directions}; the
+non-anonymized repository will be linked in the camera-ready version. The
+study models (Qwen~2.5~3B Base and Instruct) and TruthfulQA are public.
 
 
 % ============================================================
