@@ -50,10 +50,10 @@ import os
 from pathlib import Path
 
 # Point this at the repo root (the folder containing config.py).
-REPO = Path("/kaggle/working/blackboxnlpAA")
+REPO = Path("/kaggle/working/concept-directions")
 if not REPO.exists():
     subprocess.check_call(
-        ["git", "clone", "https://github.com/ArnavLifelessCoder/blackboxnlpAA.git",
+        ["git", "clone", "<ANONYMIZED_REPO_URL>",
          str(REPO)]
     )
 os.chdir(REPO)

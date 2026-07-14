@@ -1,7 +1,7 @@
 # Experimental Design & Validity
 
 > Purpose: lock the study to claims that survive review. Read with
-> `docs/dataset_notes.md` (data caveats) and `next_steps.md` (plan).
+> `docs/dataset_notes.md` (data caveats).
 
 ## Research question
 
@@ -100,7 +100,7 @@ extra extraction.
 
 ## The experiments we actually claim
 
-| # | Claim | Data | Outcome (2026-07-12, see `docs/results_summary.md`) |
+| # | Claim | Data | Outcome |
 |---|---|---|---|
 | **E1 (primary)** | Honesty directions fragment across domains | TruthfulQA (single source, real) | **Partially supported** — early-mid layers (0.522 @ L5), partial late convergence |
 | **E2** | Refusal directions fragment | **prompt-based** (harmful vs harmless) | **Not supported** — universal (0.83–0.94) |

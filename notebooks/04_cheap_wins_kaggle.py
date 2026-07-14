@@ -35,10 +35,10 @@
 import subprocess, sys, os
 from pathlib import Path
 
-REPO = Path("/kaggle/working/blackboxnlpAA")
+REPO = Path("/kaggle/working/concept-directions")
 if not REPO.exists():
     subprocess.check_call(["git", "clone",
-        "https://github.com/ArnavLifelessCoder/blackboxnlpAA.git", str(REPO)])
+        "<ANONYMIZED_REPO_URL>", str(REPO)])
 os.chdir(REPO)
 sys.path.insert(0, str(REPO))
 

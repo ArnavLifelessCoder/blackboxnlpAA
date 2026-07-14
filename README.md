@@ -18,7 +18,7 @@ We stress-test the claims of Zou et al. (2023) by computing per-domain vs. globa
 
 Additional observations: the Gemma 2 2B pilot's refusal fragmentation (cos 0.56) did **not** replicate on Qwen with the same data recipe (model-specific, an open scale/family question); and a 4-bit-vs-fp16 check shows quantization does not distort the measured geometry (cross-precision cosine ≥0.977).
 
-**All numbers:** [docs/results_summary.md](docs/results_summary.md) · raw reports in `new_results_final/` · remaining work: [docs/whats_left.md](docs/whats_left.md)
+**All numbers:** raw reports in `new_results_final/`; see `docs/experimental_design.md` for the validity design and `docs/commands.md` to reproduce.
 
 ## Concepts & Domains
 

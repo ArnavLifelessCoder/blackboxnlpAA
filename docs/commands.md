@@ -4,17 +4,15 @@ All commands run from the project root. Labels:
 **[CPU]** runs on your laptop · **[GPU/KAGGLE]** needs a GPU session ·
 **[LOCAL]** git/latex on your machine.
 
-> **Status 2026-07-12: all extraction/analysis/steering runs are DONE** —
-> canonical outputs in `new_results_final/`, numbers in
-> [`docs/results_summary.md`](results_summary.md). The GPU sections below are
-> kept for reproduction. Fresh runs write to `results/` (auto-created).
+> The GPU sections below are kept for reproduction. Fresh runs write to
+> `results/` (auto-created).
 
 ---
 
 ## Setup — [LOCAL, CPU] (run once)
 
 ```powershell
-cd "C:\Users\Arnav Gawade(pro)\Downloads\blackboxnlpAA"
+cd <project-root>
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1            # Git Bash: source .venv/Scripts/activate
 pip install -r requirements.txt
@@ -79,7 +77,7 @@ design-faithful run (prompt-based refusal + balanced caps). Equivalent CLI:
 
 ```bash
 # Kaggle notebook with GPU enabled, after cloning the repo:
-!git clone https://github.com/<you>/blackboxnlp-2026 /kaggle/working/blackboxnlp
+!git clone <ANONYMIZED_REPO_URL> /kaggle/working/concept-directions
 
 # Refusal — prompt-based, balanced (primary refusal condition)
 python scripts/build_refusal_promptbased.py --max-per-domain 120
@@ -125,13 +123,13 @@ sweep runs don't overwrite each other. **Prompt-based data must be rebuilt on a
 fresh clone first** (gitignored): `python scripts/build_refusal_promptbased.py --max-per-domain 120`.
 
 The full final GPU session (analysis rerun + E4 + E2′) is scripted in
-`notebooks/03_final_session_kaggle.py`; remaining work in `docs/whats_left.md`.
+`notebooks/03_final_session_kaggle.py`.
 
 ## Git — [LOCAL]
 
 ```powershell
 git status
-gh repo create blackboxnlp-2026 --private --source=. --remote=origin --push
+gh repo create <repo-name> --private --source=. --remote=origin --push
 ```
 
 ## Paper — [LOCAL]
