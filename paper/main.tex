@@ -350,16 +350,15 @@ expected signature of a fine-tune.
 \begin{table}[t]
   \centering
   \small
-  \begin{tabular}{lll}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{@{}l p{2.0cm} p{2.7cm}@{}}
     \toprule
     & \textbf{Honesty} & \textbf{Refusal} \\
     \midrule
-    Source & TruthfulQA & AdvBench, MedSafety- \\
-           &            & Bench, hand-written \\
+    Source & TruthfulQA & AdvBench, MedSafetyBench, hand-written \\
     Domains & 4 & 4 \\
-    Pairs/domain & $\le$120 (math 59) & 91--120 \\
-    Contrast & true vs.\ false & harmful vs.\ harmless \\
-             & answer & prompt (+ resp.\ variant) \\
+    Pairs/dom. & $\le$120 (math 59) & 91--120 \\
+    Contrast & true vs.\ false answer & harmful vs.\ harmless prompt (+ resp.\ variant) \\
     \bottomrule
   \end{tabular}
   \caption{Data summary. Both concepts are additionally extracted from the
@@ -757,7 +756,6 @@ is a shared pool across domains.
   painkillers for minor, manageable pain?''
 \end{itemize}
 
-\clearpage
 \section{Full Layer-wise Results}
 \label{app:layers}
 
