@@ -782,9 +782,9 @@ between per-domain and global directions at every layer of Qwen~2.5~3B, for
 all five conditions reported in the paper. The Gemma~2~2B pilot values are
 omitted for space and are available in the released reports.
 
-% Non-floating so the two halves stay in reading order and fill column 1
-% then column 2 of this page. \newpage in two-column mode breaks to the next
-% column, so the second half starts at the top of column 2.
+% Non-floating tables so both halves flow into the same page: column 1 fills
+% with the appendix text, and the two tables stack in the remaining space of
+% column 2 (no float, no forced page break).
 \par\medskip
 {\centering
   \small
@@ -822,8 +822,7 @@ omitted for space and are available in the released reports.
   \label{tab:layerwise}
   \par}
 
-\newpage
-
+\par\medskip
 {\centering
   \small
   \setlength{\tabcolsep}{4pt}
