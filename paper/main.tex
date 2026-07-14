@@ -784,7 +784,9 @@ omitted for space and are available in the released reports.
 
 % Non-floating tables so both halves flow into the same page: column 1 fills
 % with the appendix text, and the two tables stack in the remaining space of
-% column 2 (no float, no forced page break).
+% column 2 (no float, no forced page break). arraystretch compresses both
+% tables so they fit on one page.
+\renewcommand{\arraystretch}{0.85}
 \par\medskip
 {\centering
   \small
